@@ -1,6 +1,7 @@
 import UIKit
 
 final class SignInPresenter: SignInPresenterLogic {
+    
     //MARK: - Constants
     enum Constants {
         
@@ -9,5 +10,7 @@ final class SignInPresenter: SignInPresenterLogic {
     weak var view: SignInViewLogic?
     
     //MARK: - Methods
-    
+    func routeToProfile(response: SignIn.routeToProfile.Response) {
+        response.navigationController?.pushViewController(ProfileAssembly.build(), animated: true)
+    }
 }

@@ -59,13 +59,12 @@ final class AuthorizationViewController: UIViewController, AuthorizationViewLogi
         view.backgroundColor = Constants.View.backgroundColor
         super.viewDidLoad()
         configureUI()
-        configureAuthorizationLabel()
-        configureSignInButton()
-        configureSignUpButton()
     }
     
     private func configureUI() {
-
+        configureAuthorizationLabel()
+        configureSignInButton()
+        configureSignUpButton()
     }
     
     private func configureAuthorizationLabel() {
