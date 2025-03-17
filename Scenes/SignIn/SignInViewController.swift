@@ -1,4 +1,6 @@
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
 
 final class SignInViewController: UIViewController, SignInViewLogic {
     //MARK: - Constants
@@ -36,8 +38,8 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     
     //MARK: - Variables
     private let interactor: SignInBuisnessLogic
-    private let emailView: InputUserDataView = InputUserDataView(labelText: Constants.emailView.labelText, textFieldPlaceholder: Constants.emailView.placeholder)
-    private let passwordView: InputUserDataView = InputUserDataView(labelText: Constants.passwordView.labelText, textFieldPlaceholder: Constants.passwordView.placeholder)
+    private let emailView: SignInInputUserDataView = SignInInputUserDataView(labelText: Constants.emailView.labelText, textFieldPlaceholder: Constants.emailView.placeholder)
+    private let passwordView: SignInInputUserDataView = SignInInputUserDataView(labelText: Constants.passwordView.labelText, textFieldPlaceholder: Constants.passwordView.placeholder)
     private let signInButton: UIButton = UIButton(type: .system)
     
     //MARK: Lyfecycles
@@ -105,10 +107,46 @@ final class SignInViewController: UIViewController, SignInViewLogic {
         passwordView.pinCenterX(to: view)
 
     }
+    
+    private func showAlert(message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: "Вход", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК", style: .default) { _ in
+            completion?()
+        })
+        present(alert, animated: true)
+    }
 
         
     //MARK: - Actions
     @objc private func signInButtonTapped() {
-        interactor.routeToProfile(request: SignIn.routeToProfile.Request(navigationController: navigationController))
+        guard let email = emailView.textField.text, !email.isEmpty,
+              let password = passwordView.textField.text, !password.isEmpty else {
+            showAlert(message: "Введите почту и пароль!")
+            return
+        }
+        
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+            if let error = error {
+                self.showAlert(message: "Ошибка входа: \(error.localizedDescription)")
+                return
+            }
+
+            guard let userId = authResult?.user.uid else { return }
+            
+            let db = Firestore.firestore()
+            db.collection("users").document(userId).getDocument { document, error in
+                if let document = document, document.exists {
+                    // Данные пользователя загружены
+                    let userData = document.data()
+                    print("Данные пользователя: \(userData ?? [:])")
+                    
+                    self.showAlert(message: "Успешный вход!") {
+                        self.interactor.routeToProfile(request: SignIn.routeToProfile.Request(navigationController: self.navigationController))
+                    }
+                } else {
+                    self.showAlert(message: "Ошибка загрузки данных: \(error?.localizedDescription ?? "Неизвестная ошибка")")
+                }
+            }
+        }
     }
 }

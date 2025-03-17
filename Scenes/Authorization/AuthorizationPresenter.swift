@@ -14,6 +14,6 @@ final class AuthorizationPresenter: AuthorizationPresenterLogic {
     }
     
     func routeToSignUp(response: Authorization.routeToSignUp.Response) {
-        response.navigationController?.pushViewController(SignUpAssembly.build(), animated: false)
+        response.navigationController?.pushViewController(SignUpAssembly.build(), animated: true)
     }
 }

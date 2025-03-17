@@ -1,15 +1,20 @@
 //
-//  InputUserDataTextField.swift
+//  SignUpUserData.swift
 //  FoodFeatures
 //
-//  Created by Михаил Рычагов on 14.03.2025.
+//  Created by Михаил Рычагов on 15.03.2025.
 //
+
 
 import UIKit
 
-final class InputUserDataView: UIView {
+final class SignUpInputUserDataView: UIView {
     //MARK: Constants
     enum Constants {
+        enum View {
+            static let height: CGFloat = 70
+            static let width: CGFloat = 320
+        }
         enum TextField {
             static let font: UIFont = .systemFont(ofSize: 20, weight: .regular)
             static let textColor: UIColor = .black
@@ -25,21 +30,19 @@ final class InputUserDataView: UIView {
             static let backgroundColor: UIColor = .clear
             static let lefConstraint: CGFloat = 10
             static let bottomConsraint: CGFloat = 5
-            
         }
         enum Other {
             static let translatesAutoresizingMaskIntoConstraints: Bool = false
         }
     }
     //MARK: - Variables
-    private let textField: UITextField = UITextField()
+    let textField: UITextField = UITextField()
     private let label: UILabel = UILabel()
-    private var labelText: String?
     private var textFieldPlaceholder: String?
+    var getText: ((String) -> Void)?
     
     //MARK: LyfeCycles
-    init (labelText: String?, textFieldPlaceholder: String?) {
-        self.labelText = labelText
+    init (textFieldPlaceholder: String?) {
         self.textFieldPlaceholder = textFieldPlaceholder
         super.init(frame: .zero)
         configureUI()
@@ -53,12 +56,11 @@ final class InputUserDataView: UIView {
     func configureUI() {
         configureView()
         configureTextField()
-        configureLabel()
     }
     
     func configureView() {
-        self.setWidth(320)
-        self.setHeight(100)
+        self.setWidth(Constants.View.width)
+        self.setHeight(Constants.View.height)
     }
     
     func configureTextField() {
@@ -70,6 +72,7 @@ final class InputUserDataView: UIView {
         textField.layer.masksToBounds = true
         textField.layer.sublayerTransform = Constants.TextField.leftTab
         textField.placeholder = textFieldPlaceholder
+        setttingTextField()
         
         self.addSubview(textField)
         textField.pinCenterX(to: self)
@@ -78,11 +81,23 @@ final class InputUserDataView: UIView {
         textField.setHeight(Constants.TextField.height)
     }
     
+    func setttingTextField() {
+        if textFieldPlaceholder == "Почта" {
+            textField.keyboardType = .emailAddress  // Показывает @ и .com
+            textField.autocapitalizationType = .none // Отключаем автозаглавные буквы
+            textField.autocorrectionType = .no // Отключаем автокоррекцию
+            textField.textContentType = .emailAddress // Улучшает автозаполнение
+        } else if textFieldPlaceholder == "Пароль" {
+            textField.isSecureTextEntry = true // Прячет вводимые символы
+            textField.keyboardType = .default // Обычная клавиатура
+            textField.textContentType = .password // Автозаполнение паролей
+        }
+    }
+    
     func configureLabel() {
         label.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
         label.font = Constants.Label.font
         label.textColor = Constants.Label.textColor
-        label.text = labelText
         label.backgroundColor = Constants.Label.backgroundColor
         
         self.addSubview(label)
