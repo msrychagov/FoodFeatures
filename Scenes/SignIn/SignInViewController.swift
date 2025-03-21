@@ -41,6 +41,7 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     private let emailView: SignInInputUserDataView = SignInInputUserDataView(labelText: Constants.emailView.labelText, textFieldPlaceholder: Constants.emailView.placeholder)
     private let passwordView: SignInInputUserDataView = SignInInputUserDataView(labelText: Constants.passwordView.labelText, textFieldPlaceholder: Constants.passwordView.placeholder)
     private let signInButton: UIButton = UIButton(type: .system)
+    private let authService = AuuthService()
     
     //MARK: Lyfecycles
     init (interactor: SignInBuisnessLogic) {
@@ -75,8 +76,8 @@ final class SignInViewController: UIViewController, SignInViewLogic {
         navigationItem.title = Constants.NavigationBar.title
         navigationController?.navigationBar.titleTextAttributes = [
             .foregroundColor: Constants.NavigationBar.textColor,
-                .font: Constants.NavigationBar.font
-            ]
+            .font: Constants.NavigationBar.font
+        ]
     }
     
     private func configureSignInButton() {
@@ -105,48 +106,41 @@ final class SignInViewController: UIViewController, SignInViewLogic {
         view.addSubview(passwordView)
         passwordView.pinTop(to: emailView.bottomAnchor, 20)
         passwordView.pinCenterX(to: view)
-
+        
     }
     
-    private func showAlert(message: String, completion: (() -> Void)? = nil) {
+    func showAlert(message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: "Вход", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "ОК", style: .default) { _ in
             completion?()
         })
         present(alert, animated: true)
     }
-
-        
+    
+    
     //MARK: - Actions
     @objc private func signInButtonTapped() {
-        guard let email = emailView.textField.text, !email.isEmpty,
-              let password = passwordView.textField.text, !password.isEmpty else {
-            showAlert(message: "Введите почту и пароль!")
-            return
-        }
-        
-        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
-            if let error = error {
-                self.showAlert(message: "Ошибка входа: \(error.localizedDescription)")
-                return
-            }
-
-            guard let userId = authResult?.user.uid else { return }
-            
-            let db = Firestore.firestore()
-            db.collection("users").document(userId).getDocument { document, error in
-                if let document = document, document.exists {
-                    // Данные пользователя загружены
-                    let userData = document.data()
-                    print("Данные пользователя: \(userData ?? [:])")
-                    
-                    self.showAlert(message: "Успешный вход!") {
-                        self.interactor.routeToProfile(request: SignIn.routeToProfile.Request(navigationController: self.navigationController))
-                    }
-                } else {
-                    self.showAlert(message: "Ошибка загрузки данных: \(error?.localizedDescription ?? "Неизвестная ошибка")")
+        guard let username = emailView.textField.text, !emailView.textField.text!.isEmpty,
+              let password = passwordView.textField.text, !passwordView.textField.text!.isEmpty
+                else {
+                    showAlert(message: "Введите имя пользователя/почту и пароль")
+                    return
                 }
-            }
-        }
+        authService.login(username: username, password: password) { [weak self] result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let tokenResponse):
+                            // Успешный вход. Можем сохранить токен, перейти в приложение и т.п.
+                            AuthManager.shared.saveToken(tokenResponse.access_token)
+                            self?.showAlert(
+                                            message: "Токен: \(tokenResponse.access_token)")
+                            // Или сохранить tokenResponse.access_token в UserDefaults или Keychain
+                        case .failure(let error):
+                            self?.showAlert(
+                                            message: error.localizedDescription)
+                        }
+                    }
+                }
+        interactor.routeToProfile(request: SignIn.routeToProfile.Request(navigationController: navigationController))
     }
 }

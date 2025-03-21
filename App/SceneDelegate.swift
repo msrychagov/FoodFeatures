@@ -22,8 +22,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         let window = UIWindow(windowScene: windowScene)
-        if Auth.auth().currentUser != nil {
-            window.rootViewController = UINavigationController(rootViewController: ProfileAssembly.build())
+        if AuthManager.shared.isLoggedIn() {
+            let tabBar = MainTabBarController()
+            tabBar.selectedIndex = 1
+            window.rootViewController = tabBar
         } else {
             window.rootViewController = UINavigationController(rootViewController: AuthorizationAssembly.build())
         }

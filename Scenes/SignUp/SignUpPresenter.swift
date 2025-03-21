@@ -4,12 +4,12 @@ final class SignUpPresenter: SignUpPresenterLogic {
     
     
     func checkFields(response: SignUp.checkField.Response) {
-        if response.nameView.textField.text!.isEmpty ||
-            response.ageView.textField.text!.isEmpty ||
-            response.sexView.textField.text!.isEmpty ||
-            response.preferencesView.textField.text!.isEmpty ||
-            response.emailView.textField.text!.isEmpty ||
-            response.passwordView.textField.text!.isEmpty {
+        if response.name.isEmpty ||
+            response.age.isEmpty ||
+            response.sex.isEmpty ||
+            response.preferences.isEmpty ||
+            response.email.isEmpty ||
+            response.password.isEmpty {
             
             view?.showAlert(message: "Заполните все поля!", completion: nil)
         }

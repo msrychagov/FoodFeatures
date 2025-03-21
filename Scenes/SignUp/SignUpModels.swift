@@ -11,12 +11,12 @@ enum SignUp {
     }
     enum registerUser {
         struct Request {
-            var nameView: SignUpInputUserDataView
-            var ageView: SignUpInputUserDataView
-            var sexView: SignUpInputUserDataView
-            var preferencesView: SignUpInputUserDataView
-            var emailView: SignUpInputUserDataView
-            var passwordView: SignUpInputUserDataView
+            var name: String
+            var age: String
+            var sex: String
+            var preferences: String
+            var email: String
+            var password: String
             var navigationController: UINavigationController?
         }
     }
@@ -30,12 +30,12 @@ enum SignUp {
     }
     enum checkField {
         struct Response {
-            var nameView: SignUpInputUserDataView
-            var ageView: SignUpInputUserDataView
-            var sexView: SignUpInputUserDataView
-            var preferencesView: SignUpInputUserDataView
-            var emailView: SignUpInputUserDataView
-            var passwordView: SignUpInputUserDataView
+            var name: String
+            var age: String
+            var sex: String
+            var preferences: String
+            var email: String
+            var password: String
         }
     }
     

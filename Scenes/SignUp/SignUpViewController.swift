@@ -62,6 +62,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     private let passwordView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.PasswordView.textFieldPlaceholder)
     private let preferencesView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.PreferencesView.textFieldPlaceholder)
     private let sexView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.SexView.textFieldPlaceholder)
+    private let authService = AuthService()
     
     
     
@@ -87,10 +88,10 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         configureSignUpButton()
         configurePasswordView()
         configureEmailView()
-        configurePreferencesView()
-        configureSexView()
-        configureAgeView()
-        configureNameView()
+//        configurePreferencesView()
+//        configureSexView()
+//        configureAgeView()
+//        configureNameView()
     }
         
     private func configureView() {
@@ -176,14 +177,30 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     //MARK: - Actions
 
     @objc private func signUpButtonTapped() {
-        interactor.registerUser(request: SignUp.registerUser.Request(
-            nameView: nameView,
-            ageView: ageView,
-            sexView: sexView,
-            preferencesView: preferencesView,
-            emailView: emailView,
-            passwordView: passwordView,
-            navigationController: self.navigationController
-        ))
+        // 1. Считываем значения из текстовых полей
+        guard let email = emailView.textField.text, !emailView.textField.text!.isEmpty,
+              let password = passwordView.textField.text, !passwordView.textField.text!.isEmpty
+                else {
+                    // Выводим ошибку, если поля пустые
+                    showAlert(message: "Введите email и пароль")
+                    return
+                }
+        authService.register(email: email, password: password) { [weak self] result in
+                    // Переключаемся на главный поток для обновления UI
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let tokenResponse):
+                            // 3. Успешная регистрация
+                            // Можно показать alert, перейти на другой экран и т. д.
+                            AuthManager.shared.saveToken(tokenResponse.access_token)
+                            self?.showAlert(
+                                            message: "Пользователь создан")
+                        case .failure(let error):
+                            // 4. Ошибка
+                            self?.showAlert(message: error.localizedDescription)
+                        }
+                    }
+                }
+        interactor.routeToProfile(request: SignUp.routeToProfile.Request(navigationController: self.navigationController))
     }
 }

@@ -11,7 +11,7 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
     
     //MARK: - Variables
     private let interactor: ProfileBuisnessLogic
-    @objc private let signOutButton: UIButton = UIButton(type: .system)
+    private let signOutButton: UIButton = UIButton(type: .system)
     
     //MARK: Lyfecycles
     init (interactor: ProfileBuisnessLogic) {
@@ -31,24 +31,24 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
     }
     
     private func configureUI() {
-            configureSignOutButton()
+        configureSignOutButton()
     }
     
     private func configureSignOutButton() {
         signOutButton.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
         view.addSubview(signOutButton)
-        signOutButton.pinBottom(to: view.bottomAnchor, 100)
+        signOutButton.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, 10)
         signOutButton.pinCenterX(to: view)
         signOutButton.setWidth(200)
         signOutButton.setHeight(50)
         signOutButton.backgroundColor = .white
         signOutButton.addTarget(self, action: #selector (signOutButtonTapped), for: .touchUpInside)
     }
-        
+    
     //MARK: - Actions
     @objc private func signOutButtonTapped() {
         do {
-            try Auth.auth().signOut()
+            try AuthManager.shared.clearToken()
             
             // Создаем новый экран авторизации
             let signInVC = AuthorizationAssembly.build()
