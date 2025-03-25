@@ -10,7 +10,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         }
         enum NameView {
             static let textFieldPlaceholder: String = "Имя"
-            static let bottomConstant: CGFloat = 15
+            static let bottomConstraint: CGFloat = 15
         }
         enum AgeView {
             static let textFieldPlaceholder: String = "Возраст"
@@ -18,11 +18,11 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         }
         enum EmailView {
             static let textFieldPlaceholder: String = "Почта"
-            static let bottomConstant: CGFloat = 15
+            static let bottomConstraint: CGFloat = 15
         }
         enum PasswordView {
             static let textFieldPlaceholder: String = "Пароль"
-            static let bottomConstant: CGFloat = 100
+            static let bottomConstraint: CGFloat = 150
         }
         enum SexView {
             static let textFieldPlaceholder: String = "Пол"
@@ -32,9 +32,6 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
             static let textFieldPlaceholder: String = "Предпочтения"
             static let bottomConstant: CGFloat = 15
         }
-        enum View {
-            static let backgroundColor: UIColor = .red
-        }
         enum NavigationBar {
             static let title: String = "Регистрация"
             static let textColor: UIColor = .black
@@ -42,13 +39,12 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         }
         enum SignUpButton {
             static let title: String = "Зарегистрироваться"
-            static let tintColor: UIColor = .black
+            static let tintColor: UIColor = .white
             static let font: UIFont = .systemFont(ofSize: 25, weight: .semibold)
-            static let backgroundColor: UIColor = .white
             static let cornerRadius: CGFloat = 20
             static let height: CGFloat = 80
             static let width: CGFloat = 300
-            static let bottomConstraint: CGFloat = 30
+            static let bottomConstraint: CGFloat = 60
         }
         
     }
@@ -91,11 +87,11 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
 //        configurePreferencesView()
 //        configureSexView()
 //        configureAgeView()
-//        configureNameView()
+        configureNameView()
     }
         
     private func configureView() {
-        view.backgroundColor = Constants.View.backgroundColor
+        view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
     }
     
     private func configureNavigationBar() {
@@ -111,7 +107,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         nameView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
         view.addSubview(nameView)
         
-        nameView.pinBottom(to: ageView.topAnchor, Constants.NameView.bottomConstant)
+        nameView.pinBottom(to: emailView.topAnchor, Constants.NameView.bottomConstraint)
         nameView.pinCenterX(to: view)
     }
     
@@ -140,14 +136,14 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         emailView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
         view.addSubview(emailView)
         
-        emailView.pinBottom(to: passwordView.topAnchor, Constants.EmailView.bottomConstant)
+        emailView.pinBottom(to: passwordView.topAnchor, Constants.EmailView.bottomConstraint)
         emailView.pinCenterX(to: view)
     }
     private func configurePasswordView() {
         passwordView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
         view.addSubview(passwordView)
         
-        passwordView.pinBottom(to: signUpButton.topAnchor, Constants.PasswordView.bottomConstant)
+        passwordView.pinBottom(to: signUpButton.topAnchor, Constants.PasswordView.bottomConstraint)
         passwordView.pinCenterX(to: view)
     }
     
@@ -156,7 +152,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         signUpButton.setTitle(Constants.SignUpButton.title, for: .normal)
         signUpButton.tintColor = Constants.SignUpButton.tintColor
         signUpButton.titleLabel?.font = Constants.SignUpButton.font
-        signUpButton.backgroundColor = Constants.SignUpButton.backgroundColor
+        signUpButton.backgroundColor = GeneralConstants.buttonsBackgroundColor
         signUpButton.layer.cornerRadius = Constants.SignUpButton.cornerRadius
         view.addSubview(signUpButton)
         
@@ -179,13 +175,14 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     @objc private func signUpButtonTapped() {
         // 1. Считываем значения из текстовых полей
         guard let email = emailView.textField.text, !emailView.textField.text!.isEmpty,
-              let password = passwordView.textField.text, !passwordView.textField.text!.isEmpty
+              let password = passwordView.textField.text, !passwordView.textField.text!.isEmpty,
+              let name = nameView.textField.text, !nameView.textField.text!.isEmpty
                 else {
                     // Выводим ошибку, если поля пустые
                     showAlert(message: "Введите email и пароль")
                     return
                 }
-        authService.register(email: email, password: password) { [weak self] result in
+        authService.register(name: name, email: email, password: password) { [weak self] result in
                     // Переключаемся на главный поток для обновления UI
                     DispatchQueue.main.async {
                         switch result {

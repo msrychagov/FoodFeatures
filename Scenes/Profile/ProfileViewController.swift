@@ -7,11 +7,34 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
         enum Other {
             static let translatesAutoresizingMaskIntoConstraints: Bool = false
         }
+        enum SignOutButton {
+            static let tintColor: UIColor = .white
+            static let font: UIFont = .systemFont(ofSize: 24, weight: .bold)
+            static let cornernRadius: CGFloat = 20
+            static let bottomConstraint: CGFloat = 10
+            static let width: CGFloat = 200
+            static let height: CGFloat = 50
+            static let text: String = "Выйти"
+        }
+        enum InfoView {
+            static var name: String = "Рычагов Михаил"
+            static let topConstraint: CGFloat = 50
+            static let width: CGFloat = 300
+            static let height: CGFloat = 150
+        }
+        enum ShowAlert {
+            static let errorTitle: String = "Ошибка"
+            static let completeTitle: String = "Ок"
+        }
     }
     
     //MARK: - Variables
     private let interactor: ProfileBuisnessLogic
     private let signOutButton: UIButton = UIButton(type: .system)
+    private let nameLabel: UILabel = UILabel()
+    private let emailLabel: UILabel = UILabel()
+    private let infoView: UserInfoView = UserInfoView()
+    private let authService = AuthService()
     
     //MARK: Lyfecycles
     init (interactor: ProfileBuisnessLogic) {
@@ -25,25 +48,68 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
     
     //MARK: - Methods
     override func viewDidLoad() {
-        view.backgroundColor = .red
+        view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
         super.viewDidLoad()
+        fetchUserInfo()
         configureUI()
     }
     
     private func configureUI() {
         configureSignOutButton()
+        configureInfoView()
     }
     
+    private func configureInfoView() {
+        infoView.configure(name: Constants.InfoView.name)
+        infoView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
+        view.addSubview(infoView)
+        infoView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, Constants.InfoView.topConstraint)
+        infoView.pinCenterX(to: view.centerXAnchor)
+        infoView.setHeight(Constants.InfoView.height)
+        infoView.setWidth(Constants.InfoView.width)
+    }
+    
+
     private func configureSignOutButton() {
         signOutButton.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
+        signOutButton.backgroundColor = GeneralConstants.buttonsBackgroundColor
+        signOutButton.tintColor = Constants.SignOutButton.tintColor
+        signOutButton.setTitle(Constants.SignOutButton.text, for: .normal)
+        signOutButton.setTitleColor(.red, for: .normal)
+        signOutButton.titleLabel?.font = Constants.SignOutButton.font
+        signOutButton.layer.cornerRadius = Constants.SignOutButton.cornernRadius
         view.addSubview(signOutButton)
-        signOutButton.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, 10)
+        signOutButton.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, Constants.SignOutButton.bottomConstraint)
         signOutButton.pinCenterX(to: view)
-        signOutButton.setWidth(200)
-        signOutButton.setHeight(50)
+        signOutButton.setWidth(Constants.SignOutButton.width)
+        signOutButton.setHeight(Constants.SignOutButton.height)
         signOutButton.backgroundColor = .white
         signOutButton.addTarget(self, action: #selector (signOutButtonTapped), for: .touchUpInside)
     }
+    
+    private func fetchUserInfo() {
+        authService.fetchCurrentUser(accessToken: AuthManager.shared.getToken()!){ [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let user):
+                        // Обновляем UI полученными данными
+                        self?.nameLabel.text = user.name
+                        self?.emailLabel.text = user.email
+                        print(user.name)
+                    case .failure(let error):
+                        // Показываем ошибку
+                        self?.showAlert(message: error.localizedDescription)
+                    }
+                }
+            }
+        }
+        
+        private func showAlert(message: String) {
+            let alert = UIAlertController(title: Constants.ShowAlert.errorTitle, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Constants.ShowAlert.completeTitle, style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+        }
+
     
     //MARK: - Actions
     @objc private func signOutButtonTapped() {

@@ -29,7 +29,9 @@ final class SignUpPresenter: SignUpPresenterLogic {
     
     //MARK: - Methods
     func routeToProfile(response: SignUp.routeToProfile.Response) {
-        response.navigationController?.pushViewController(ProfileAssembly.build(), animated: true)
+        let tabBar = MainTabBarController()
+        tabBar.selectedIndex = 1
+        response.navigationController?.setViewControllers([tabBar], animated: true)
     }
     
 }

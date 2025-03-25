@@ -3,30 +3,26 @@ import UIKit
 final class AuthorizationViewController: UIViewController, AuthorizationViewLogic {
     //MARK: - Constants
     enum Constants {
-        enum View {
-            static let backgroundColor: UIColor = .red
-        }
         enum SignInButton {
             static let title: String = "Вход"
-            static let tintColor: UIColor = .black
+            static let tintColor: UIColor = .white
             static let font: UIFont = .systemFont(ofSize: 30, weight: .semibold)
-            static let backgroundColor: UIColor = .white
             static let cornerRadius: CGFloat = 20
             static let height: CGFloat = 80
             static let width: CGFloat = 230
-            static let topConstraint: CGFloat = 10
+            static let topConstraint: CGFloat = 20
         }
         enum SignUpButton {
             static let title: String = "Регистрация"
-            static let tintColor: UIColor = .black
+            static let tintColor: UIColor = .white
             static let font: UIFont = .systemFont(ofSize: 30, weight: .semibold)
-            static let backgroundColor: UIColor = .white
             static let cornerRadius: CGFloat = 20
             static let height: CGFloat = 80
             static let width: CGFloat = 230
-            static let topConstraint: CGFloat = 10
+            static let topConstraint: CGFloat = 25
         }
         enum AuthorizationLabel {
+            static let topConstraint: CGFloat = 140
             static let textAlignment: NSTextAlignment = .center
             static let font = UIFont.systemFont(ofSize: 35, weight: .heavy)
             static let textColor: UIColor = .black
@@ -56,7 +52,7 @@ final class AuthorizationViewController: UIViewController, AuthorizationViewLogi
     
     //MARK: - Methods
     override func viewDidLoad() {
-        view.backgroundColor = Constants.View.backgroundColor
+        view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
         super.viewDidLoad()
         configureUI()
     }
@@ -77,7 +73,7 @@ final class AuthorizationViewController: UIViewController, AuthorizationViewLogi
         view.addSubview(authorizationLabel)
         
         authorizationLabel.pinCenterX(to: view)
-        authorizationLabel.pinCenterY(to: view)
+        authorizationLabel.pinTop(to: view.safeAreaLayoutGuide.topAnchor, Constants.AuthorizationLabel.topConstraint)
     }
     
     private func configureSignInButton() {
@@ -85,12 +81,12 @@ final class AuthorizationViewController: UIViewController, AuthorizationViewLogi
         signInButton.setTitle(Constants.SignInButton.title, for: .normal)
         signInButton.tintColor = Constants.SignInButton.tintColor
         signInButton.titleLabel?.font = Constants.SignInButton.font
-        signInButton.backgroundColor = Constants.SignInButton.backgroundColor
+        signInButton.backgroundColor = GeneralConstants.buttonsBackgroundColor
         signInButton.layer.cornerRadius = Constants.SignInButton.cornerRadius
         view.addSubview(signInButton)
         
         signInButton.pinCenterX(to: view)
-        signInButton.pinTop(to: authorizationLabel.bottomAnchor, Constants.SignInButton.topConstraint)
+        signInButton.pinCenterY(to: view)
         signInButton.setHeight(Constants.SignInButton.height)
         signInButton.setWidth(Constants.SignInButton.width)
         signInButton.addTarget(self, action: #selector (signInButtonTapped), for: .touchUpInside)
@@ -101,7 +97,7 @@ final class AuthorizationViewController: UIViewController, AuthorizationViewLogi
         signUpButton.setTitle(Constants.SignUpButton.title, for: .normal)
         signUpButton.tintColor = Constants.SignUpButton.tintColor
         signUpButton.titleLabel?.font = Constants.SignUpButton.font
-        signUpButton.backgroundColor = Constants.SignUpButton.backgroundColor
+        signUpButton.backgroundColor = GeneralConstants.buttonsBackgroundColor
         signUpButton.layer.cornerRadius = Constants.SignUpButton.cornerRadius
         view.addSubview(signUpButton)
         

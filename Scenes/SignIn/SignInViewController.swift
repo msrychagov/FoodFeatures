@@ -5,18 +5,14 @@ import FirebaseFirestore
 final class SignInViewController: UIViewController, SignInViewLogic {
     //MARK: - Constants
     enum Constants {
-        enum View {
-            static let backgroundColor: UIColor = .red
-        }
         enum SignInButton {
             static let title: String = "Войти"
-            static let tintColor: UIColor = .black
+            static let tintColor: UIColor = .white
             static let font: UIFont = .systemFont(ofSize: 30, weight: .semibold)
-            static let backgroundColor: UIColor = .white
             static let cornerRadius: CGFloat = 20
             static let height: CGFloat = 80
             static let width: CGFloat = 230
-            static let bottomConstraint: CGFloat = 30
+            static let bottomConstraint: CGFloat = 60
         }
         enum NavigationBar {
             static let title: String = "Вход"
@@ -41,7 +37,7 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     private let emailView: SignInInputUserDataView = SignInInputUserDataView(labelText: Constants.emailView.labelText, textFieldPlaceholder: Constants.emailView.placeholder)
     private let passwordView: SignInInputUserDataView = SignInInputUserDataView(labelText: Constants.passwordView.labelText, textFieldPlaceholder: Constants.passwordView.placeholder)
     private let signInButton: UIButton = UIButton(type: .system)
-    private let authService = AuuthService()
+    private let authService = AuthService()
     
     //MARK: Lyfecycles
     init (interactor: SignInBuisnessLogic) {
@@ -68,7 +64,7 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     }
     
     private func configureView() {
-        view.backgroundColor = Constants.View.backgroundColor
+        view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
     }
     
     private func configureNavigationBar() {
@@ -85,7 +81,7 @@ final class SignInViewController: UIViewController, SignInViewLogic {
         signInButton.setTitle(Constants.SignInButton.title, for: .normal)
         signInButton.tintColor = Constants.SignInButton.tintColor
         signInButton.titleLabel?.font = Constants.SignInButton.font
-        signInButton.backgroundColor = Constants.SignInButton.backgroundColor
+        signInButton.backgroundColor = GeneralConstants.buttonsBackgroundColor
         signInButton.layer.cornerRadius = Constants.SignInButton.cornerRadius
         view.addSubview(signInButton)
         

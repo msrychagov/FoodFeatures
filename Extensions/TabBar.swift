@@ -5,16 +5,29 @@ final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Создаём контроллеры для вкладок
-        let productsVC = ProductsAssembly.build() // "Продукты"
+        let marketsVC = MarketsAssembly.build()
+        let favoritesVC = FavoritesAssembly.build()
+        let scannerVC = ScannerAssembly.build()
         let profileVC = ProfileAssembly.build() // "Профиль"
         
         // Задаём каждому контроллеру UITabBarItem
         
-        productsVC.tabBarItem = UITabBarItem(
-            title: "Продукты",
-            image: UIImage(systemName: "bag.fill"),
-            selectedImage: UIImage(systemName: "bag.fill")
+        marketsVC.tabBarItem = UITabBarItem(
+            title: "Магазины",
+            image: UIImage(systemName: "basket.fill"),
+            selectedImage: UIImage(systemName: "basket.fill")
+        )
+        
+        scannerVC.tabBarItem = UITabBarItem(
+            title: "Сканер",
+            image: UIImage(systemName: "barcode"),
+            selectedImage: UIImage(systemName: "barcode")
+        )
+        
+        favoritesVC.tabBarItem = UITabBarItem(
+            title: "Избранное",
+            image: UIImage(systemName: "heart.fill"),
+            selectedImage: UIImage(systemName: "heart.fill")
         )
         
         profileVC.tabBarItem = UITabBarItem(
@@ -24,11 +37,13 @@ final class MainTabBarController: UITabBarController {
         )
         
         // Оборачиваем каждый контроллер в UINavigationController, если нужно
-        let productsNav = UINavigationController(rootViewController: productsVC)
+        let marketsNav = UINavigationController(rootViewController: marketsVC)
+        let scannerNav = UINavigationController(rootViewController: scannerVC)
+        let favoritesNav = UINavigationController(rootViewController: favoritesVC)
         let profileNav = UINavigationController(rootViewController: profileVC)
         
         // Назначаем контроллеры таб-бара
-        viewControllers = [productsNav, profileNav]
+        viewControllers = [marketsNav, scannerNav, favoritesNav, profileNav]
         
         // Настраиваем внешний вид таб-бара
         setupTabBarAppearance()
@@ -39,7 +54,7 @@ final class MainTabBarController: UITabBarController {
         if #available(iOS 15.0, *) {
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .systemRed
+            appearance.backgroundColor = GeneralConstants.buttonsBackgroundColor
             
             // Цвет иконок и текста в активном состоянии
             appearance.stackedLayoutAppearance.selected.iconColor = .white

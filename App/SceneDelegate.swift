@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import Firebase
-import FirebaseAuth
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -18,14 +16,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        FirebaseApp.configure()
         
         
         let window = UIWindow(windowScene: windowScene)
         if AuthManager.shared.isLoggedIn() {
             let tabBar = MainTabBarController()
-            tabBar.selectedIndex = 1
-            window.rootViewController = tabBar
+            tabBar.selectedIndex = 0
+            window.rootViewController = UINavigationController(rootViewController: tabBar)
         } else {
             window.rootViewController = UINavigationController(rootViewController: AuthorizationAssembly.build())
         }

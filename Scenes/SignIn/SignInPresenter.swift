@@ -21,6 +21,8 @@ final class SignInPresenter: SignInPresenterLogic {
     
     //MARK: - Methods
     func routeToProfile(response: SignIn.routeToProfile.Response) {
-        response.navigationController?.pushViewController(ProfileAssembly.build(), animated: true)
+        let tabBar = MainTabBarController()
+        tabBar.selectedIndex = 1
+        response.navigationController?.setViewControllers([tabBar], animated: true)
     }
 }
