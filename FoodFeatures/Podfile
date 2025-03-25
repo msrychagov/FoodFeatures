@@ -1,0 +1,12 @@
+platform :ios, '13.0'
+
+target 'FoodFeatures' do
+  
+  pod 'FirebaseCore'
+  pod 'FirebaseStorage'
+  pod 'FirebaseAuth'
+  pod 'FirebaseFirestore'
+
+  
+
+end
