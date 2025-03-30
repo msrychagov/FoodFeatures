@@ -6,14 +6,14 @@ final class AuthorizationPresenter: AuthorizationPresenterLogic {
         
     }
     //MARK: Variables
-    weak var view: AuthorizationViewLogic?
+    weak var view: (AuthorizationViewLogic & UIViewController)?
     
     //MARK: - Methods
     func routeToSignIn(response: Authorization.routeToSignIn.Response) {
-        response.navigationController?.pushViewController(SignInAssembly.build(), animated: true)
+        view?.navigationController?.pushViewController(SignInAssembly.build(), animated: true)
     }
     
     func routeToSignUp(response: Authorization.routeToSignUp.Response) {
-        response.navigationController?.pushViewController(SignUpAssembly.build(), animated: true)
+        view?.navigationController?.pushViewController(SignUpAssembly.build(), animated: true)
     }
 }

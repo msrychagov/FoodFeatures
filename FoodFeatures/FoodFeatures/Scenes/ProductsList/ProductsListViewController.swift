@@ -52,20 +52,25 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(handleFavoriteAdded(notification:)),
-                                                   name: Notification.Name("FavoriteAdded"),
-                                                   object: nil)
-        NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(handleFavoriteRemoved(notification:)),
-                                                   name: Notification.Name("FavoriteRemoved"),
-                                                   object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleFavoriteAdded(notification:)),
+            name: Notification.Name("FavoriteAdded"),
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleFavoriteRemoved(notification:)),
+            name: Notification.Name("FavoriteRemoved"),
+            object: nil
+        )
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
         title = "Продукты"
         
         if chapter == "Default" {
             let request = ProductsModels.Load.Request(storeId: storeId, categoryId: categoryId)
             interactor.loadProducts(request: request)
+            // TODO: - YAGNI
 //            LoadProductsService().fetchProducts(storeId: marketId, categoryId: categoryId) { [weak self]
 //                result in
 //                DispatchQueue.main.async {

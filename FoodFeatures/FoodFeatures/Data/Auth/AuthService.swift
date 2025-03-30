@@ -1,24 +1,9 @@
 import Foundation
 
-struct TokenResponse: Codable {
-    let access_token: String
-    let token_type: String
-    //    let user_id: Int
-}
-
-struct User: Codable {
-    let id: Int
-    let name: String
-    let email: String
-    // Если нужно, добавьте age, bio и т.д.
-}
-
 class AuthService {
     // Важно: подставьте ваш реальный URL сервера
     private let baseURL = "http://127.0.0.1:8000"
     
-    // Регистрация
-    // На сервере должен быть эндпоинт /register, который возвращает {"access_token": "...", "token_type": "..."}
     func register(name: String, email: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/register") else {
             completion(.failure(NSError(domain: "Invalid URL", code: 0)))

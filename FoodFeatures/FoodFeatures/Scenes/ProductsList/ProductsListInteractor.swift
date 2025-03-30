@@ -28,6 +28,7 @@ final class ProductsListInteractor: ProductsBuisnessLogic {
             }
         }
     }
+    
     func loadFavoriteProducts(request: ProductsModels.Load.Request) {
         worker.fetchFavoriteProducts(storeId: request.storeId, categoryId: request.categoryId) { [weak self] result in
             DispatchQueue.main.async {

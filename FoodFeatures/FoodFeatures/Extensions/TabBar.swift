@@ -8,7 +8,7 @@ final class MainTabBarController: UITabBarController {
         let marketsVC = MarketsAssembly.build()
         let favoritesVC = FavoritesAssembly.build()
         let scannerVC = ScannerAssembly.build()
-        let profileVC = ProfileAssembly.build() // "Профиль"
+        let profileVC = ProfileAssembly.build()
         
         // Задаём каждому контроллеру UITabBarItem
         
@@ -37,8 +37,8 @@ final class MainTabBarController: UITabBarController {
         )
         
         // Оборачиваем каждый контроллер в UINavigationController, если нужно
-        let marketsNav = UINavigationController(rootViewController: marketsVC)
         let scannerNav = UINavigationController(rootViewController: scannerVC)
+        let marketsNav = UINavigationController(rootViewController: marketsVC)
         let favoritesNav = UINavigationController(rootViewController: favoritesVC)
         let profileNav = UINavigationController(rootViewController: profileVC)
         
