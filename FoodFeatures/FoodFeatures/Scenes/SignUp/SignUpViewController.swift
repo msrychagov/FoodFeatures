@@ -75,6 +75,8 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     //MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
         configureUI()
     }
     
@@ -228,5 +230,9 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
 //                        }
 //                    }
 //                }
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
