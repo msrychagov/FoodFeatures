@@ -50,6 +50,8 @@ class Product(BaseModel):
 # Схема для регистрации
 class UserCreate(BaseModel):
     name: str
+    age: int
+    preferences: list[str]
     email: EmailStr
     password: str
 

@@ -1,8 +1,10 @@
 import UIKit
-import FirebaseAuth
-import FirebaseFirestore
 
 final class SignUpViewController: UIViewController, SignUpViewLogic {
+    func displayPreferences(viewModel: SignUpModels.UpdatePrefernces.ViewModel) {
+        self.displayedPrefernces = viewModel.preferences
+    }
+    
     //MARK: - Constants
     enum Constants {
         enum Other {
@@ -56,9 +58,12 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     private let ageView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.AgeView.textFieldPlaceholder)
     private let emailView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.EmailView.textFieldPlaceholder)
     private let passwordView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.PasswordView.textFieldPlaceholder)
-    private let preferencesView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.PreferencesView.textFieldPlaceholder)
-    private let sexView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.SexView.textFieldPlaceholder)
+    private let preferencesLabel: UILabel = UILabel()
+    private let stackView: UIStackView = UIStackView()
+    private let preferencesTableView: UITableView = UITableView()
     private let authService = AuthService()
+    private var displayedPrefernces: [Preference] = []
+    
     
     
     
@@ -75,6 +80,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     //MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        interactor.fetchPreferences()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
         configureUI()
@@ -84,12 +90,9 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         configureView()
         configureNavigationBar()
         configureSignUpButton()
-        configurePasswordView()
-        configureEmailView()
-//        configurePreferencesView()
-//        configureSexView()
-//        configureAgeView()
-        configureNameView()
+        configurePreferencesLabel()
+        configurePreferencesTableView()
+        configureStackView()
     }
         
     private func configureView() {
@@ -104,49 +107,34 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
                 .font: Constants.NavigationBar.font
             ]
     }
-    
-    private func configureNameView() {
-        nameView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
-        view.addSubview(nameView)
-        
-        nameView.pinBottom(to: emailView.topAnchor, Constants.NameView.bottomConstraint)
-        nameView.pinCenterX(to: view)
+    private func configurePreferencesLabel() {
+        preferencesLabel.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
+        preferencesLabel.font = .systemFont(ofSize: 22, weight: .bold)
+        preferencesLabel.text = "Выберите предпочтения:"
+    }
+    private func configurePreferencesTableView() {
+        preferencesTableView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
+        preferencesTableView.backgroundColor = .clear
+        preferencesTableView.separatorStyle = .none
+        preferencesTableView.register(PreferenceCell.self, forCellReuseIdentifier: PreferenceCell.reuseIdentifier)
+        preferencesTableView.dataSource = self
     }
     
-    private func configureAgeView() {
-        ageView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
-        view.addSubview(ageView)
+    private func configureStackView() {
+        stackView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
+        stackView.backgroundColor = .clear
+        stackView.axis = .vertical
+        stackView.spacing = 10
+        stackView.clipsToBounds = true
         
-        ageView.pinBottom(to: sexView.topAnchor, Constants.AgeView.bottomConstant)
-        ageView.pinCenterX(to: view)
-    }
-    private func configureSexView() {
-        sexView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
-        view.addSubview(sexView)
-        
-        sexView.pinBottom(to: preferencesView.topAnchor, Constants.SexView.bottomConstant)
-        sexView.pinCenterX(to: view)
-    }
-    private func configurePreferencesView() {
-        preferencesView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
-        view.addSubview(preferencesView)
-        
-        preferencesView.pinBottom(to: emailView.topAnchor, Constants.PreferencesView.bottomConstant)
-        preferencesView.pinCenterX(to: view)
-    }
-    private func configureEmailView() {
-        emailView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
-        view.addSubview(emailView)
-        
-        emailView.pinBottom(to: passwordView.topAnchor, Constants.EmailView.bottomConstraint)
-        emailView.pinCenterX(to: view)
-    }
-    private func configurePasswordView() {
-        passwordView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
-        view.addSubview(passwordView)
-        
-        passwordView.pinBottom(to: signUpButton.topAnchor, Constants.PasswordView.bottomConstraint)
-        passwordView.pinCenterX(to: view)
+        for subView in [nameView, ageView, emailView, passwordView, preferencesLabel, preferencesTableView] {
+            stackView.addArrangedSubview(subView)
+        }
+        view.addSubview(stackView)
+        stackView.pinCenterX(to: view.centerXAnchor)
+        stackView.pinTop(to: view.topAnchor, 100)
+        stackView.pinBottom(to: signUpButton.topAnchor, 50)
+        stackView.setWidth(300)
     }
     
     private func configureSignUpButton() {
@@ -193,6 +181,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
 
     @objc private func signUpButtonTapped() {
         guard let name = nameView.textField.text,
+              let age = Int(ageView.textField.text!),
               let email = emailView.textField.text,
               let password = passwordView.textField.text,
                       !name.isEmpty, !email.isEmpty, !password.isEmpty
@@ -202,7 +191,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
                 }
                 
                 // Формируем Request для регистрации
-                let request = SignUpModels.SignUp.Request(name: name, email: email, password: password)
+        let request = SignUpModels.SignUp.Request(name: name, age: age, email: email, password: password)
             interactor.signUp(request: request)
         // 1. Считываем значения из текстовых полей
 //        guard let email = emailView.textField.text, !emailView.textField.text!.isEmpty,
@@ -236,3 +225,25 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         view.endEditing(true)
     }
 }
+
+
+extension SignUpViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return displayedPrefernces.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: PreferenceCell.reuseIdentifier, for: indexPath)
+        guard let preferenceCell = cell as? PreferenceCell else { return cell }
+        preferenceCell.configure(with: displayedPrefernces[indexPath.row])
+        preferenceCell.didSelectedPreference = { [weak self] in
+            guard let self = self else { return }
+            interactor.updatePreferences(request: SignUpModels.UpdatePrefernces.Request(preferenceIndex: indexPath.row))
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+        return preferenceCell
+    }
+    
+    
+}
+

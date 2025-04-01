@@ -10,4 +10,5 @@ struct Product: Decodable {
     let name: String
     let image_url: String
     let store_id: Int
-    let description: String}
+    let description: String
+}

@@ -8,12 +8,13 @@
 import Foundation
 
 class LoadProductsService {
+    private let baseURL = "http://172.20.10.2:8000"
     // Важно: подставьте ваш реальный URL сервера
     func fetchProducts(storeId: Int, categoryId: Int,
                        completion: @escaping (Result<[Product], Error>) -> Void)
     {
         // Формируем URL
-        guard let url = URL(string: "http://127.0.0.1:8000/stores/\(storeId)/categories/\(categoryId)/products")
+        guard let url = URL(string: "\(baseURL)/stores/\(storeId)/categories/\(categoryId)/products")
         else {
             return
         }
@@ -51,7 +52,7 @@ class LoadProductsService {
                        completion: @escaping (Result<[Product], Error>) -> Void)
     {
         // Формируем URL
-        guard let url = URL(string: "http://127.0.0.1:8000/favorites/\(storeId)/\(categoryId)")
+        guard let url = URL(string: "\(baseURL)/favorites/\(storeId)/\(categoryId)")
         else {
             return
         }

@@ -9,7 +9,7 @@ final class ProductsListInteractor: ProductsBuisnessLogic {
     
     //MARK: Variables
     let presenter: ProductsPresenterLogic
-    private lazy var worker: ProductsWorker = ProductsWorker(interactor: self)
+    private lazy var worker: ProductsWorkerLogic = ProductsWorker(interactor: self)
     
     //MARK: - Lyfesycles
     init (presenter: ProductsPresenterLogic) {

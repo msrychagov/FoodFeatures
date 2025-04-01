@@ -28,16 +28,16 @@ def register_user(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
 
     # Создаем пользователя
     hashed = hashing.hash_password(user_data.password)
-    new_user = models.User(name=user_data.name, email=user_data.email, hashed_password=hashed)
+    new_user = models.User(name=user_data.name, age=user_data.age, preferences=user_data.preferences, email=user_data.email, hashed_password=hashed)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
     # Генерируем токен
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    # access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
         data={"sub": new_user.email},
-        expires_delta=access_token_expires
+        # expires_delta=access_token_expires
     )
 
     # Возвращаем JSON с токеном

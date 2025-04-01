@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import FirebaseAuth
-import FirebaseFirestore
 
 class SignInWorker: SignInWorkerLogic {
     let interactor: SignInBuisnessLogic

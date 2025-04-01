@@ -1,6 +1,12 @@
 import UIKit
+import AVFoundation
 
 final class ScannerViewController: UIViewController, ScannerViewLogic {
+    func scanSuccess() {
+        let request = ScannerModels.RouteToScannedProduct.Request(navigationController: self.navigationController!)
+        interactor.routeToScannedProduct(request: request)
+    }
+    
     //MARK: - Constants
     enum Constants {
         enum Other {
@@ -10,6 +16,7 @@ final class ScannerViewController: UIViewController, ScannerViewLogic {
     
     //MARK: - Variables
     private let interactor: ScannerBuisnessLogic
+    private var barcode: String = ""
     
     //MARK: Lyfecycles
     init (interactor: ScannerBuisnessLogic) {
@@ -24,12 +31,22 @@ final class ScannerViewController: UIViewController, ScannerViewLogic {
     //MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        let request = ScannerModels.Setup.Request(view: view)
+        interactor.startScanning(request: request)
         configureUI()
     }
     
-    private func configureUI() {
-
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        interactor.resumeScanning()
     }
+    
+//    override func viewWillLayoutSubviews() {
+//        super.viewWillLayoutSubviews()
+//        previewLayer?.frame = view.bounds
+//    }
+    
+    private func configureUI() {
         
-    //MARK: - Actions
+    }
 }

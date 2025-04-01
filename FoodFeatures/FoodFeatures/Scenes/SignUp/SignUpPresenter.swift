@@ -1,6 +1,11 @@
 import UIKit
 
 final class SignUpPresenter: SignUpPresenterLogic {
+    func presentFetchedPreferences(response: SignUpModels.UpdatePrefernces.Response) {
+        let viewModel = SignUpModels.UpdatePrefernces.ViewModel(preferences: response.preferences)
+        view?.displayPreferences(viewModel: viewModel)
+    }
+    
     
     
     func checkFields(response: SignUpModels.checkField.Response) {

@@ -1,5 +1,4 @@
 import UIKit
-import FirebaseAuth
 
 final class ProfileViewController: UIViewController, ProfileViewLogic {
     //MARK: - Constants
@@ -96,7 +95,7 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
                     case .success(let user):
                         // Обновляем UI полученными данными
                         self?.name = user.name
-                        print(self?.name)
+                        print(user)
                         self?.configureUI()
                     case .failure(let error):
                         // Показываем ошибку

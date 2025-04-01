@@ -6,13 +6,12 @@
 //
 
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
 import UIKit
 
 final class SignUpWorker: SignUpWorkerLogic {
-    func signUp(name: String, email: String, password: String, completion: @escaping (Result<TokenResponse, any Error>) -> Void) {
-        AuthService().register(name: name, email: email, password: password, completion: completion)
+    
+    func signUp(name: String, age: Int, preferences: [String], email: String, password: String, completion: @escaping (Result<TokenResponse, any Error>) -> Void) {
+        AuthService().register(name: name, age: age, preferences: preferences, email: email, password: password, completion: completion)
     }
     
     //MARK: - Variables

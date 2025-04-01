@@ -1,6 +1,4 @@
 import UIKit
-import FirebaseAuth
-import FirebaseFirestore
 
 final class SignInViewController: UIViewController, SignInViewLogic {
     //MARK: - Constants

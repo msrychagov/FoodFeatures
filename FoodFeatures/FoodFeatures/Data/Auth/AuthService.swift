@@ -2,9 +2,9 @@ import Foundation
 
 class AuthService {
     // Важно: подставьте ваш реальный URL сервера
-    private let baseURL = "http://127.0.0.1:8000"
+    private let baseURL = "http://172.20.10.2:8000"
     
-    func register(name: String, email: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
+    func register(name: String, age: Int, preferences: [String], email: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/register") else {
             completion(.failure(NSError(domain: "Invalid URL", code: 0)))
             return
@@ -17,6 +17,8 @@ class AuthService {
         
         let body: [String: Any] = [
             "name": name,
+            "age": age,
+//            "preferences": preferences,
             "email": email,
             "password": password
         ]
@@ -115,7 +117,7 @@ class AuthService {
     
     func fetchCurrentUser(accessToken: String, completion: @escaping (Result<User, Error>) -> Void) {
         // Замените URL на ваш реальный эндпоинт
-        guard let url = URL(string: "http://127.0.0.1:8000/users/me") else {
+        guard let url = URL(string: "\(baseURL)/users/me") else {
             completion(.failure(NSError(domain: "Invalid url", code: 0)))
             return
         }

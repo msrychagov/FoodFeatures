@@ -7,7 +7,7 @@
 import Foundation
 
 final class FavoriteService {
-    private let baseURL = "http://127.0.0.1:8000"
+    private let baseURL = "http://172.20.10.2:8000"
     func removeFromFavorites(productId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         
         guard let url = URL(string: "\(baseURL)/favorites/\(productId)") else {

@@ -43,7 +43,7 @@ final class MainTabBarController: UITabBarController {
         let profileNav = UINavigationController(rootViewController: profileVC)
         
         // Назначаем контроллеры таб-бара
-        viewControllers = [marketsNav, favoritesNav, profileNav]
+        viewControllers = [marketsNav, scannerNav, favoritesNav, profileNav]
         
         // Настраиваем внешний вид таб-бара
         setupTabBarAppearance()

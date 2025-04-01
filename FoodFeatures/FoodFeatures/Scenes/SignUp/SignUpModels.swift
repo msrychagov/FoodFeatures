@@ -12,6 +12,7 @@ enum SignUpModels {
     enum SignUp {
             struct Request {
                 let name: String
+                let age: Int
                 let email: String
                 let password: String
             }
@@ -25,15 +26,15 @@ enum SignUpModels {
                 let errorMessage: String
             }
         }
-    enum registerUser {
+    enum UpdatePrefernces {
         struct Request {
-            var name: String
-            var age: String
-            var sex: String
-            var preferences: String
-            var email: String
-            var password: String
-            var navigationController: UINavigationController?
+            var preferenceIndex: Int
+        }
+        struct Response {
+            var preferences: [Preference]
+        }
+        struct ViewModel {
+            var preferences: [Preference]
         }
     }
     enum showAlert {

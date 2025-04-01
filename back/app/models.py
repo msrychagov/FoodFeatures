@@ -1,5 +1,5 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, Float, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, Float, Text, ARRAY
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -67,6 +67,8 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    age = Column(Integer, nullable=True)
+    preferences = Column(ARRAY(String), nullable=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
 
