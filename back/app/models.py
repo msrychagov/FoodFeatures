@@ -33,14 +33,16 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    
-    # Добавьте нужные колонки:
-    # price = Column(Float, default=0.0, nullable=False)
-    # discount = Column(Float, default=0.0, nullable=False)
-    # old_price = Column(Float, default=0.0, nullable=False)
-    # unit = Column(String, default="")
-    image_url = Column(String, default="")
     description = Column(Text, default="")
+    image_url = Column(String, default="")
+    specificies = Column(String, default="")
+    fat_content = Column(String, default="")
+    volume = Column(String, default="")
+    compound = Column(String, default="")
+    energy_value = Column(String, default="")
+    protein = Column(String, default="")
+    fats = Column(String, default="")
+    carbs = Column(String, default="")
 
     store_id = Column(Integer, ForeignKey("stores.id"))
     store = relationship("Store", back_populates="products")
@@ -67,7 +69,6 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    age = Column(Integer, nullable=True)
     preferences = Column(ARRAY(String), nullable=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)

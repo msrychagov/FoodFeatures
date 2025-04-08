@@ -12,7 +12,6 @@ enum SignUpModels {
     enum SignUp {
             struct Request {
                 let name: String
-                let age: Int
                 let email: String
                 let password: String
             }

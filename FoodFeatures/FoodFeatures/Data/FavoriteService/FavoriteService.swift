@@ -7,10 +7,9 @@
 import Foundation
 
 final class FavoriteService {
-    private let baseURL = "http://172.20.10.2:8000"
     func removeFromFavorites(productId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         
-        guard let url = URL(string: "\(baseURL)/favorites/\(productId)") else {
+        guard let url = URL(string: "\(GeneralConstants.baseURL)/favorites/\(productId)") else {
             completion(.failure(NSError(domain: "InvalidURL", code: 0)))
             return
         }
@@ -54,7 +53,7 @@ final class FavoriteService {
     func addToFavorites(productId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         
         // 1) Формируем URL, например, POST http://127.0.0.1:8000/favorites/{product_id}
-        guard let url = URL(string: "\(baseURL)/favorites/\(productId)") else {
+        guard let url = URL(string: "\(GeneralConstants.baseURL)/favorites/\(productId)") else {
             completion(.failure(NSError(domain: "InvalidURL", code: 0)))
             return
         }
@@ -103,7 +102,7 @@ final class FavoriteService {
     }
     
     func isLiked(productId: Int, completion: @escaping (Result<Bool, Error>) -> Void) {
-        guard let url = URL(string: "\(baseURL)/favorites/\(productId)") else {
+        guard let url = URL(string: "\(GeneralConstants.baseURL)/favorites/\(productId)") else {
             completion(.failure(NSError(domain: "InvalidURL", code: 0)))
             return
         }

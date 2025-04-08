@@ -36,13 +36,17 @@ class ProductCreate(ProductBase):
 class Product(BaseModel):
     id: int
     name: str
-    # price: float
-    # discount: float
-    # old_price: float
-    # unit: str
-    image_url: str
-    store_id: int
     description: str
+    image_url: str
+    specificies: str
+    fat_content: str
+    volume: str
+    compound: str
+    energy_value: str
+    protein: str
+    fats: str
+    carbs: str
+    store_id: int
 
     class Config:
         orm_mode = True
@@ -50,10 +54,15 @@ class Product(BaseModel):
 # Схема для регистрации
 class UserCreate(BaseModel):
     name: str
-    age: int
     preferences: list[str]
     email: EmailStr
     password: str
+
+class UserUpdate(BaseModel):
+    name: str
+    preferences: list[str]
+    email: EmailStr
+
 
 # Схема для вывода (без пароля)
 class UserOut(BaseModel):

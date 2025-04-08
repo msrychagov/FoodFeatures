@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ProductsListViewController: UIViewController, ProductsListViewLogic {
+class ProductsListViewController: UIViewController, ProductsListViewLogic{
     //MARK: - Constants
     enum Constants {
         enum General {
@@ -15,11 +15,11 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic {
         }
         enum CollectionView {
             static let itemSize: CGSize = .init(width: 180, height: 250)
-            static let minimumInteritemSpacing: CGFloat = 4
-            static let minimumLineSpacing: CGFloat = 10
+            static let minimumInteritemSpacing: CGFloat = 16
+            static let minimumLineSpacing: CGFloat = 16
             static let alwaysBounceVertical: Bool = true
             static let showsVerticalScrollIndicator: Bool = false
-            static let contentInset: UIEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
+            static let contentInset: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16)
             static let constraint: CGFloat = 5
             static let backgroundColor: UIColor = .clear
         }
@@ -70,33 +70,10 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic {
         if chapter == "Default" {
             let request = ProductsModels.Load.Request(storeId: storeId, categoryId: categoryId)
             interactor.loadProducts(request: request)
-            // TODO: - YAGNI
-//            LoadProductsService().fetchProducts(storeId: marketId, categoryId: categoryId) { [weak self]
-//                result in
-//                DispatchQueue.main.async {
-//                    switch result {
-//                    case .success(let remoteProducts):
-//                        self!.products = remoteProducts
-//                        self?.collectionView.reloadData()
-//                    case .failure(let error):
-//                                    print("Ошибка загрузки с сервера: \(error)")
-//                                }
-//                }}
         }
         else {
             let request = ProductsModels.Load.Request(storeId: storeId, categoryId: categoryId)
             interactor.loadFavoriteProducts(request: request)
-//            LoadProductsService().fetchFavoriteProducts(storeId: marketId, categoryId: categoryId) { [weak self]
-//                result in
-//                DispatchQueue.main.async {
-//                    switch result {
-//                    case .success(let remoteProducts):
-//                        self!.products = remoteProducts
-//                        self?.collectionView.reloadData()
-//                    case .failure(let error):
-//                                    print("Ошибка загрузки с сервера: \(error)")
-//                                }
-//                }}
         }
         // Начинаем загрузку
         configureUI()
@@ -146,11 +123,10 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic {
     }
     
     private func configureCollectionView() {
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.itemSize = Constants.CollectionView.itemSize
-            layout.minimumInteritemSpacing = Constants.CollectionView.minimumInteritemSpacing
-            layout.minimumLineSpacing = Constants.CollectionView.minimumLineSpacing
-            layout.invalidateLayout()
+        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowLayout.minimumInteritemSpacing = Constants.CollectionView.minimumInteritemSpacing
+            flowLayout.minimumLineSpacing = Constants.CollectionView.minimumLineSpacing
+            flowLayout.sectionInset = Constants.CollectionView.contentInset
         }
         collectionView.translatesAutoresizingMaskIntoConstraints = Constants.General.translatesAutoresizingMaskIntoConstraints
         collectionView.register(ProductsListCell.self, forCellWithReuseIdentifier: ProductsListCell.reuseIdentifier)
@@ -159,7 +135,6 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic {
         collectionView.delegate = self
         collectionView.alwaysBounceVertical = Constants.CollectionView.alwaysBounceVertical
         collectionView.showsVerticalScrollIndicator = Constants.CollectionView.showsVerticalScrollIndicator
-        collectionView.contentInset = Constants.CollectionView.contentInset
         collectionView.backgroundColor = Constants.CollectionView.backgroundColor
         view.addSubview(collectionView)
         collectionView.pin(to: view, Constants.CollectionView.constraint)
@@ -192,5 +167,28 @@ extension ProductsListViewController: UICollectionViewDelegate {
         print("Выбран продукт: \(product.name)\nId: \(product.id)")
         let detailViewController = ProductInfoAssembly.build(product: product)
         navigationController?.pushViewController(detailViewController, animated: true)
+    }
+}
+
+
+extension ProductsListViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        // Количество ячеек в строке
+        let numberOfItemsInRow: CGFloat = 2
+        // Отступы по краям коллекции (inset), плюс межэлементный интервал
+        let totalSpacing = (Constants.CollectionView.contentInset.left
+                            + Constants.CollectionView.contentInset.right
+                            + (Constants.CollectionView.minimumInteritemSpacing * (numberOfItemsInRow - 1)))
+        // Вычисляем доступную ширину под ячейки
+        let availableWidth = collectionView.bounds.width - totalSpacing
+        // Делим доступную ширину на количество ячеек в строке
+        let width = floor(availableWidth / numberOfItemsInRow)
+        // Задаём высоту, либо исходя из пропорций, либо фиксированную
+        let height: CGFloat = 250
+        
+        return CGSize(width: width, height: height)
     }
 }

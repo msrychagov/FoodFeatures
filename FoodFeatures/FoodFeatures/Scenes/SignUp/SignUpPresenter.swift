@@ -35,14 +35,14 @@ final class SignUpPresenter: SignUpPresenterLogic {
     //MARK: - Methods
     
     func presentSignUpSuccess(response: SignUpModels.SignUp.Response) {
-            let viewModel = SignUpModels.SignUp.ViewModelSuccess(token: response.token)
-            view?.displaySignUpSuccess(viewModel: viewModel)
-        }
-        
-        func presentSignUpFailure(error: Error) {
-            let viewModel = SignUpModels.SignUp.ViewModelFailure(errorMessage: error.localizedDescription)
-            view?.displaySignUpFailure(viewModel: viewModel)
-        }
+        let viewModel = SignUpModels.SignUp.ViewModelSuccess(token: response.token)
+        view?.displaySignUpSuccess(viewModel: viewModel)
+    }
+    
+    func presentSignUpFailure(error: Error) {
+        let viewModel = SignUpModels.SignUp.ViewModelFailure(errorMessage: error.localizedDescription)
+        view?.displaySignUpFailure(viewModel: viewModel)
+    }
     
     func routeToProfile(response: SignUpModels.routeToProfile.Response) {
         let tabBar = MainTabBarController()

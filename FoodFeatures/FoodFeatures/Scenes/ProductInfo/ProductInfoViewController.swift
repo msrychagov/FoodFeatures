@@ -11,7 +11,7 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
         }
         enum NameLabel {
             static let numberOfLines: Int = 2
-            static let font: UIFont = .systemFont(ofSize: 25, weight: .bold)
+            static let font: UIFont = .systemFont(ofSize: 16, weight: .bold)
             static let textAlignment: NSTextAlignment = .center
             static let topConstraint: CGFloat = 2
             static let horizontalConstraint: CGFloat = 10
@@ -50,6 +50,10 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
     private let nameLabel: UILabel = UILabel()
     private let descriptionLabel: UILabel = UILabel()
     private let likeButton: UIButton = UIButton(type: .custom)
+    private let infoViewsStack: UIStackView = UIStackView()
+    private let generalCharacteristicsInfoView: ExpandableProductInfoView = ExpandableProductInfoView()
+    private let descriptionInfoView: ExpandableProductInfoView = ExpandableProductInfoView()
+    private let nutritionalValueInfoView: ExpandableProductInfoView = ExpandableProductInfoView()
     private let product: Product
     private var isLiked: Bool
     var isFavorite: Bool = false {
@@ -112,17 +116,26 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
         configureContentView()
         configureWrap()
         configureImageView()
-        configureNameLabel()
-        //        configureDescriptionLabel()
         configureLikeButton()
-    }
+        configureNameLabel()
+        configureGeneralCharacteristicsInfoView()
+        configureDescriptionInfoView()
+        configureNutritionalValueInfoView()
+        configureInfoViewsStack()
+        }
     
     private func configureScrollView() {
         scrollView.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         view.addSubview(scrollView)
-        scrollView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        scrollView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
-        scrollView.pinHorizontal(to: view)
+//        scrollView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+//        scrollView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
+//        scrollView.pinHorizontal(to: view)
+        NSLayoutConstraint.activate([
+                scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            ])
     }
     
     private func configureContentView() {
@@ -171,29 +184,6 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
         imageView.pin(to: wrap)
     }
     
-    private func configureNameLabel() {
-        nameLabel.translatesAutoresizingMaskIntoConstraints = Constants.General.translatesAutoresizingMaskIntoConstraints
-        nameLabel.text = product.name
-        nameLabel.numberOfLines = Constants.NameLabel.numberOfLines
-        nameLabel.font = Constants.NameLabel.font
-        nameLabel.textAlignment = Constants.NameLabel.textAlignment
-        contentView.addSubview(nameLabel)
-        nameLabel.pinTop(to: wrap.bottomAnchor, Constants.NameLabel.topConstraint)
-        nameLabel.pinHorizontal(to: contentView, Constants.NameLabel.horizontalConstraint) // Привязываем к contentView!
-    }
-    
-    private func configureDescriptionLabel() {
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
-        descriptionLabel.text = product.description
-        descriptionLabel.font = .systemFont(ofSize: 17, weight: .regular)
-        descriptionLabel.numberOfLines = 10
-        contentView.addSubview(descriptionLabel)
-        descriptionLabel.pinTop(to: nameLabel.bottomAnchor, 2)
-        descriptionLabel.pinHorizontal(to: contentView, 10) // Привязываем к contentView!
-        // Не забудьте добавить нижнее ограничение, если это последний элемент:
-        descriptionLabel.pinBottom(to: contentView.bottomAnchor, 2)
-    }
-    
     private func configureLikeButton() {
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -204,12 +194,63 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
         likeButton.setImage(heartNormal, for: .normal)
         likeButton.setImage(heartSelected, for: .selected)
         
-        view.addSubview(likeButton)
-        likeButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor, Constants.LikeButton.topConsraint)
-        likeButton.pinRight(to: view.trailingAnchor, Constants.LikeButton.rightConsraint)
+        wrap.addSubview(likeButton)
+        likeButton.pinTop(to: wrap.topAnchor, Constants.LikeButton.topConsraint)
+        likeButton.pinRight(to: wrap.trailingAnchor, Constants.LikeButton.rightConsraint)
         likeButton.addTarget(self, action: #selector (addToFavoriteTapped), for: .touchUpInside)
     }
     
+    private func configureNameLabel() {
+        nameLabel.translatesAutoresizingMaskIntoConstraints = Constants.General.translatesAutoresizingMaskIntoConstraints
+        nameLabel.text = product.name
+        nameLabel.numberOfLines = 0
+        nameLabel.lineBreakMode = .byWordWrapping
+        nameLabel.font = Constants.NameLabel.font
+        nameLabel.textAlignment = Constants.NameLabel.textAlignment
+        contentView.addSubview(nameLabel)
+        nameLabel.pinTop(to: wrap.bottomAnchor, Constants.NameLabel.topConstraint)
+        nameLabel.pinHorizontal(to: contentView, Constants.NameLabel.horizontalConstraint) // Привязываем к contentView!
+    }
+    
+    private func configureGeneralCharacteristicsInfoView() {
+        generalCharacteristicsInfoView.configure(title: "Общие характеристики",
+            descriptionfields: [DescriptionField(title: "Особенности", value: product.specificies)])
+    }
+    
+    private func configureDescriptionInfoView() {
+        descriptionInfoView.configure(title: "Описание",
+                                      descriptionfields: [DescriptionField(title: "Состав", value: product.compound)]
+            )
+    }
+    
+    private func configureNutritionalValueInfoView() {
+        nutritionalValueInfoView.configure(title: "Пищевая ценность на 100г",
+                                           descriptionfields: [DescriptionField(title: "Белки", value: product.protein),
+                                                               DescriptionField(title: "Жиры", value: product.fats),
+                                                               DescriptionField(title: "Углеводы", value: product.carbs),
+                                                               DescriptionField(title: "Энергетическая ценность", value: product.energy_value)]
+        )
+    }
+    
+    
+    
+    private func configureInfoViewsStack () {
+        infoViewsStack.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
+        infoViewsStack.axis = .vertical
+        infoViewsStack.spacing = 8
+        infoViewsStack.alignment = .fill   // чтобы каждый сабвью растягивался по ширине
+        infoViewsStack.distribution = .fill
+        for infoView in [generalCharacteristicsInfoView, descriptionInfoView, nutritionalValueInfoView] {
+            infoViewsStack.addArrangedSubview(infoView)
+        }
+        contentView.addSubview(infoViewsStack)
+        infoViewsStack.pinTop(to: nameLabel.bottomAnchor, 24)
+        infoViewsStack.pinHorizontal(to: contentView)
+        infoViewsStack.pinBottom(to: contentView)
+    }
+    
+    
+    //MARK: - Methods
     func displayToggleFavoriteSuccess(viewModel: ProductInfoModels.ToggleFavorite.ViewModelSuccess) {
         // Обновляем локальное состояние
         DispatchQueue.main.async {

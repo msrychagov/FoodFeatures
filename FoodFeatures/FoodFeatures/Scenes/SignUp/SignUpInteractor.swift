@@ -10,9 +10,20 @@ final class SignUpInteractor: SignUpBuisnessLogic {
     private let presenter: SignUpPresenterLogic
     private lazy var worker: SignUpWorker = SignUpWorker(interactor: self)
     private var userPreferences: [String] = []
-    var preferences: [Preference] = [Preference(title: "без лактозы", isSelected: false),
-                                         Preference(title: "без глютена", isSelected: false),
-                                         Preference(title: "халяль", isSelected: false)]
+    private var preferences: [Preference] = [Preference(title: "Лактоза", isSelected: false),
+                                     Preference(title: "Глютен", isSelected: false),
+                                     Preference(title: "Орехи", isSelected: false),
+                                     Preference(title: "Арахис", isSelected: false),
+                                     Preference(title: "Сезам", isSelected: false),
+                                     Preference(title: "Соя", isSelected: false),
+                                     Preference(title: "Сельдерей", isSelected: false),
+                                     Preference(title: "Горчица", isSelected: false),
+                                     Preference(title: "Люпин", isSelected: false),
+                                     Preference(title: "Рыба", isSelected: false),
+                                     Preference(title: "Ракообразные", isSelected: false),
+                                     Preference(title: "Моллюски", isSelected: false),
+                                     Preference(title: "Нет ограничений", isSelected: false)
+    ]
     private var navigationController: UINavigationController?
     
     //MARK: - Lyfesycles
@@ -28,6 +39,25 @@ final class SignUpInteractor: SignUpBuisnessLogic {
     func updatePreferences(request: SignUpModels.UpdatePrefernces.Request) {
         var currentpPreferenceIndex = request.preferenceIndex
         preferences[currentpPreferenceIndex].isSelected.toggle()
+        
+        if currentpPreferenceIndex == preferences.count - 1 {
+            userPreferences.removeAll()
+            
+            for i in 0...preferences.count - 2 {
+                if preferences[i].isSelected {
+                    preferences[i].isSelected.toggle()
+                    fetchPreferences()
+                }
+            }
+        }
+        
+        else {
+            if preferences[preferences.count - 1].isSelected {
+                userPreferences.removeAll()
+                preferences[preferences.count - 1].isSelected.toggle()
+            }
+        }
+        
         if preferences[currentpPreferenceIndex].isSelected {
             userPreferences.append(preferences[currentpPreferenceIndex].title)
         } else {
@@ -35,28 +65,26 @@ final class SignUpInteractor: SignUpBuisnessLogic {
                 userPreferences.remove(at: index)
             }
         }
-        print(preferences)
         print(userPreferences)
         
         fetchPreferences()
     }
     
     func signUp(request: SignUpModels.SignUp.Request) {
-        worker.signUp(name: request.name, age: request.age, preferences: userPreferences, email: request.email, password: request.password) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let tokenResponse):
-                        // Формируем Response, передаём токен
-                        AuthManager.shared.saveToken(tokenResponse.access_token)
-                        let response = SignUpModels.SignUp.Response(token: tokenResponse.access_token)
-                        self?.presenter.presentSignUpSuccess(response: response)
-                    case .failure(let error):
-                        self?.presenter.presentSignUpFailure(error: error)
-                    }
+        worker.signUp(name: request.name, preferences: userPreferences, email: request.email, password: request.password) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let tokenResponse):
+                    // Формируем Response, передаём токен
+                    AuthManager.shared.saveToken(tokenResponse.access_token)
+                    let response = SignUpModels.SignUp.Response(token: tokenResponse.access_token)
+                    self?.presenter.presentSignUpSuccess(response: response)
+                case .failure(let error):
+                    self?.presenter.presentSignUpFailure(error: error)
                 }
             }
         }
-    
+    }
     func routeToProfile(request: SignUpModels.routeToProfile.Request) {
         presenter.routeToProfile(response: SignUpModels.routeToProfile.Response(navigationController: request.navigationController))
     }

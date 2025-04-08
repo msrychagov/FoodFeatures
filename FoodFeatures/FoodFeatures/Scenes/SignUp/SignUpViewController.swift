@@ -1,9 +1,6 @@
 import UIKit
 
 final class SignUpViewController: UIViewController, SignUpViewLogic {
-    func displayPreferences(viewModel: SignUpModels.UpdatePrefernces.ViewModel) {
-        self.displayedPrefernces = viewModel.preferences
-    }
     
     //MARK: - Constants
     enum Constants {
@@ -14,10 +11,6 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
             static let textFieldPlaceholder: String = "Имя"
             static let bottomConstraint: CGFloat = 15
         }
-        enum AgeView {
-            static let textFieldPlaceholder: String = "Возраст"
-            static let bottomConstant: CGFloat = 15
-        }
         enum EmailView {
             static let textFieldPlaceholder: String = "Почта"
             static let bottomConstraint: CGFloat = 15
@@ -25,10 +18,6 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         enum PasswordView {
             static let textFieldPlaceholder: String = "Пароль"
             static let bottomConstraint: CGFloat = 150
-        }
-        enum SexView {
-            static let textFieldPlaceholder: String = "Пол"
-            static let bottomConstant: CGFloat = 15
         }
         enum PreferencesView {
             static let textFieldPlaceholder: String = "Предпочтения"
@@ -54,10 +43,9 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     //MARK: - Variables
     private let interactor: SignUpBuisnessLogic
     private let signUpButton: UIButton = UIButton(type: .system)
-    private let nameView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.NameView.textFieldPlaceholder)
-    private let ageView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.AgeView.textFieldPlaceholder)
-    private let emailView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.EmailView.textFieldPlaceholder)
-    private let passwordView: SignUpInputUserDataView = SignUpInputUserDataView(textFieldPlaceholder: Constants.PasswordView.textFieldPlaceholder)
+    private let nameView: UserDataView = UserDataView(textFieldPlaceholder: Constants.NameView.textFieldPlaceholder)
+    private let emailView: UserDataView = UserDataView(textFieldPlaceholder: Constants.EmailView.textFieldPlaceholder)
+    private let passwordView: UserDataView = UserDataView(textFieldPlaceholder: Constants.PasswordView.textFieldPlaceholder)
     private let preferencesLabel: UILabel = UILabel()
     private let stackView: UIStackView = UIStackView()
     private let preferencesTableView: UITableView = UITableView()
@@ -94,7 +82,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         configurePreferencesTableView()
         configureStackView()
     }
-        
+    
     private func configureView() {
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
     }
@@ -104,13 +92,14 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         navigationItem.title = Constants.NavigationBar.title
         navigationController?.navigationBar.titleTextAttributes = [
             .foregroundColor: Constants.NavigationBar.textColor,
-                .font: Constants.NavigationBar.font
-            ]
+            .font: Constants.NavigationBar.font
+        ]
     }
     private func configurePreferencesLabel() {
         preferencesLabel.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         preferencesLabel.font = .systemFont(ofSize: 22, weight: .bold)
-        preferencesLabel.text = "Выберите предпочтения:"
+        preferencesLabel.textAlignment = .center
+        preferencesLabel.text = "Выберите пищевые ограничения:"
     }
     private func configurePreferencesTableView() {
         preferencesTableView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
@@ -124,16 +113,16 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         stackView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
         stackView.backgroundColor = .clear
         stackView.axis = .vertical
-        stackView.spacing = 10
+        stackView.spacing = 8
         stackView.clipsToBounds = true
         
-        for subView in [nameView, ageView, emailView, passwordView, preferencesLabel, preferencesTableView] {
+        for subView in [nameView, emailView, passwordView, preferencesLabel, preferencesTableView] {
             stackView.addArrangedSubview(subView)
         }
         view.addSubview(stackView)
         stackView.pinCenterX(to: view.centerXAnchor)
-        stackView.pinTop(to: view.topAnchor, 100)
-        stackView.pinBottom(to: signUpButton.topAnchor, 50)
+        stackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 48)
+        stackView.pinBottom(to: signUpButton.topAnchor, 48)
         stackView.setWidth(300)
     }
     
@@ -161,64 +150,40 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         present(alert, animated: true)
     }
     
+    func displayPreferences(viewModel: SignUpModels.UpdatePrefernces.ViewModel) {
+        self.displayedPrefernces = viewModel.preferences
+        preferencesTableView.reloadData()
+    }
+    
     func displaySignUpSuccess(viewModel: SignUpModels.SignUp.ViewModelSuccess) {
-            // Здесь можно, например, показать сообщение об успехе, а затем выполнить переход:
+        // Здесь можно, например, показать сообщение об успехе, а затем выполнить переход:
         print("Токен получен: \(viewModel.token)")
         interactor.routeToProfile(request: SignUpModels.routeToProfile.Request(navigationController: self.navigationController!))
-        }
-        
-        // При ошибке регистрации
-        func displaySignUpFailure(viewModel: SignUpModels.SignUp.ViewModelFailure) {
-            showAlert(message: viewModel.errorMessage)
-        }
-        
-        private func showAlert(message: String) {
-            let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "ОК", style: .default))
-            present(alert, animated: true)
-        }
+    }
+    
+    // При ошибке регистрации
+    func displaySignUpFailure(viewModel: SignUpModels.SignUp.ViewModelFailure) {
+        showAlert(message: viewModel.errorMessage)
+    }
+    
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК", style: .default))
+        present(alert, animated: true)
+    }
     //MARK: - Actions
-
+    
     @objc private func signUpButtonTapped() {
         guard let name = nameView.textField.text,
-              let age = Int(ageView.textField.text!),
               let email = emailView.textField.text,
               let password = passwordView.textField.text,
-                      !name.isEmpty, !email.isEmpty, !password.isEmpty
-                else {
-                    showAlert(message: "Пожалуйста, заполните все поля")
-                    return
-                }
-                
-                // Формируем Request для регистрации
-        let request = SignUpModels.SignUp.Request(name: name, age: age, email: email, password: password)
-            interactor.signUp(request: request)
-        // 1. Считываем значения из текстовых полей
-//        guard let email = emailView.textField.text, !emailView.textField.text!.isEmpty,
-//              let password = passwordView.textField.text, !passwordView.textField.text!.isEmpty,
-//              let name = nameView.textField.text, !nameView.textField.text!.isEmpty
-//                else {
-//                    // Выводим ошибку, если поля пустые
-//                    showAlert(message: "Введите email и пароль")
-//                    return
-//                }
-//        authService.register(name: name, email: email, password: password) { result in
-//                    // Переключаемся на главный поток для обновления UI
-//                    DispatchQueue.main.async {
-//                        switch result {
-//                        case .success(let tokenResponse):
-//                            // 3. Успешная регистрация
-//                            // Можно показать alert, перейти на другой экран и т. д.
-//                            AuthManager.shared.saveToken(tokenResponse.access_token)
-//                            self.showAlert(
-//                                            message: "Пользователь создан")
-//                            self.interactor.routeToProfile(request: SignUp.routeToProfile.Request(navigationController: self.navigationController))
-//                        case .failure(let error):
-//                            // 4. Ошибка
-//                            self.showAlert(message: error.localizedDescription)
-//                        }
-//                    }
-//                }
+              !name.isEmpty, !email.isEmpty, !password.isEmpty
+        else {
+            showAlert(message: "Пожалуйста, заполните все поля")
+            return
+        }
+        let request = SignUpModels.SignUp.Request(name: name, email: email, password: password)
+        interactor.signUp(request: request)
     }
     
     @objc func dismissKeyboard() {
@@ -239,7 +204,6 @@ extension SignUpViewController: UITableViewDataSource {
         preferenceCell.didSelectedPreference = { [weak self] in
             guard let self = self else { return }
             interactor.updatePreferences(request: SignUpModels.UpdatePrefernces.Request(preferenceIndex: indexPath.row))
-            tableView.reloadRows(at: [indexPath], with: .automatic)
         }
         return preferenceCell
     }

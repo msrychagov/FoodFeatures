@@ -72,6 +72,7 @@ final class ProductsListCell: UICollectionViewCell {
         wrap.translatesAutoresizingMaskIntoConstraints = Constants.General.translatesAutoresizingMaskIntoConstraints
         wrap.backgroundColor = .white
         wrap.layer.cornerRadius = Constants.Wrap.cornerRadius
+        wrap.clipsToBounds = true
         contentView.addSubview(wrap)
         wrap.pinTop(to: contentView)
         wrap.pinHorizontal(to: contentView)
@@ -92,9 +93,8 @@ final class ProductsListCell: UICollectionViewCell {
     
     private func configureImageView() {
         imageView.translatesAutoresizingMaskIntoConstraints = Constants.General.translatesAutoresizingMaskIntoConstraints
-        imageView.clipsToBounds = Constants.ImageView.clipsToBounds
         imageView.contentMode = Constants.ImageView.contentMode
-        contentView.addSubview(imageView)
+        wrap.addSubview(imageView)
         imageView.pin(to: wrap)
     }
 

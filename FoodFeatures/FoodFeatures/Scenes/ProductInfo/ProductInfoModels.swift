@@ -17,3 +17,8 @@ enum ProductInfoModels {
         }
     }
 }
+
+struct DescriptionField {
+    var title: String
+    var value: String
+}

@@ -15,8 +15,7 @@ final class CategoriesViewController: UIViewController, CategoriesViewLogic {
     private let chapter: String
     private let categories: [Category] = [
         Category(title: "Без глютена", image: "glutenfree", id: 5),
-        Category(title: "Без лактозы", image: "lactosefree", id: 2),
-        Category(title: "Халяль", image: "halal", id: 4)
+        Category(title: "Без лактозы", image: "lactosefree", id: 1)
     ]
     
     private lazy var collectionView: UICollectionView = {

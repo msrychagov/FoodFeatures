@@ -28,5 +28,5 @@ protocol SignUpViewLogic: AnyObject {
 }
 
 protocol SignUpWorkerLogic {
-    func signUp(name: String, age: Int, preferences: [String], email: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void)
+    func signUp(name: String, preferences: [String], email: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void)
 }

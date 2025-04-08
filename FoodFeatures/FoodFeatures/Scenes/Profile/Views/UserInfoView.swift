@@ -6,12 +6,13 @@ final class UserInfoView: UIView {
         enum NameLabel {
             static let font: UIFont = .systemFont(ofSize: 30, weight: .bold)
         }
+        enum EmailLabel {
+            static let font: UIFont = .systemFont(ofSize: 17, weight: .medium)
+        }
         enum EditnButton {
             
         }
-        enum avatarImageView {
-            
-        }
+        
         enum General {
             static let translatesAutoresizingMaskIntoConstraints: Bool = false
             static let backgroundColor: UIColor = .white
@@ -21,9 +22,7 @@ final class UserInfoView: UIView {
     
     // MARK: - Variables
     
-    private let containerView = UIView()
-    
-    private let avatarImageView: UIImageView = UIImageView()
+    private let emailLabel: UILabel = UILabel()
     
     private let nameLabel: UILabel = UILabel()
     
@@ -43,14 +42,15 @@ final class UserInfoView: UIView {
     // MARK: - Configuration
     
     /// Заполняет вью реальными данными
-    func configure(name: String) {
+    func configure(name: String, email: String) {
         nameLabel.text = name
+        emailLabel.text = email
         configureUI()
-        self.backgroundColor = Constants.General.backgroundColor
     }
     
     func configureUI() {
         configureNameLabel()
+        configureEmailLabel()
     }
     
     func configureNameLabel() {
@@ -58,6 +58,15 @@ final class UserInfoView: UIView {
         nameLabel.font = Constants.NameLabel.font
         self.addSubview(nameLabel)
         nameLabel.pinCenterX(to: self)
-        nameLabel.pinCenterY(to: self)
+        nameLabel.pinTop(to: self.topAnchor, 16)
+    }
+    
+    func configureEmailLabel() {
+        emailLabel.translatesAutoresizingMaskIntoConstraints = Constants.General.translatesAutoresizingMaskIntoConstraints
+        emailLabel.font = Constants.EmailLabel.font
+        emailLabel.textColor = .systemGray
+        self.addSubview(emailLabel)
+        emailLabel.pinCenterX(to: self)
+        emailLabel.pinTop(to: nameLabel.bottomAnchor)
     }
 }

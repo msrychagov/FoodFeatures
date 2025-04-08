@@ -63,32 +63,17 @@ def upload_vprok_milk_csv(
 
     for row in reader:
         product_name = row.get("Заголовок") or "Без имени"
-        
-        # Пример извлечения цены
-        price_str = row.get("Цена", "0").replace(",", ".")
-        try:
-            price = float(price_str)
-        except ValueError:
-            price = 0.0
-
-        old_price_str = row.get("Старая цена", "0").replace(",", ".")
-        try:
-            old_price = float(old_price_str)
-        except ValueError:
-            old_price = 0.0
-
-        discount_str = row.get("Скидка", "0").replace(",", ".")
-        try:
-            discount = float(discount_str)
-        except ValueError:
-            discount = 0.0
-
-        # "Единица измерения" (опционально)
-        unit = row.get("Единица измерения") or ""
-
+        description = row.get("Описание") or "Без описания"
         image_url = row.get("Изображения") or ""
+        specificies = row.get("Особенности") or "Без особенностей"
+        fat_content = row.get("Жирность") or "Без жирности"
+        volume = row.get("Объем") or "Без объема"
+        compound = row.get("Состав") or "Без состава"
+        energy_value = row.get("Энергетическая ценность") or "Без энергетической ценности"
+        protein = row.get("Белки") or ""
+        fats = row.get("Жиры") or ""
+        carbs = row.get("Углеводы") or ""
 
-        description = row.get("Описание") or ""
         # 4) Ищем, не существует ли продукт с таким названием в этом магазине
         db_product = db.query(models.Product).filter_by(
             name=product_name,
@@ -100,24 +85,31 @@ def upload_vprok_milk_csv(
             db_product = models.Product(
                 name=product_name,
                 store_id=store.id,
-                # price=price,
-                # discount=discount,
-                # old_price=old_price,    # если в моделях есть соответствующее поле
-                # unit=unit,              # если в моделях есть соответствующее поле
+                description=description,
                 image_url=image_url,
-                description=description
+                specificies=category_name,
+                fat_content=fat_content,
+                volume=volume,
+                compound=compound,
+                energy_value=energy_value + "Ккал",
+                protein=protein,
+                fats=fats,
+                carbs=carbs,
             )
             db.add(db_product)
             db.commit()
             db.refresh(db_product)
         else:
-            # Обновляем
-            # db_product.price = price
-            # db_product.discount = discount
-            # db_product.old_price = old_price
-            # db_product.unit = unit
-            db_product.image_url = image_url
             db_product.description = description
+            db_product.image_url = image_url
+            db_product.specificies = category_name
+            db_product.fat_content = fat_content
+            db_product.volume = volume
+            db_product.compound = compound
+            db_product.energy_value = energy_value + " Ккал"
+            db_product.protein = protein
+            db_product.fats = fats
+            db_product.carbs = carbs
             db.commit()
             db.refresh(db_product)
 
@@ -128,20 +120,20 @@ def upload_vprok_milk_csv(
             db.refresh(db_product)
 
         # 6) Проверяем "без лактозы" (пример)
-        if "безлактоз" in product_name.lower():
-            cat_lact_free = db.query(models.Category).filter_by(name="Без лактозы").first()
-            if not cat_lact_free:
-                cat_lact_free = models.Category(name="Без лактозы")
-                db.add(cat_lact_free)
-                db.commit()
-                db.refresh(cat_lact_free)
+        # if "безлактоз" in product_name.lower():
+        #     cat_lact_free = db.query(models.Category).filter_by(name="Без лактозы").first()
+        #     if not cat_lact_free:
+        #         cat_lact_free = models.Category(name="Без лактозы")
+        #         db.add(cat_lact_free)
+        #         db.commit()
+        #         db.refresh(cat_lact_free)
 
-            if cat_lact_free not in db_product.categories:
-                db_product.categories.append(cat_lact_free)
-                db.commit()
-                db.refresh(db_product)
+        #     if cat_lact_free not in db_product.categories:
+        #         db_product.categories.append(cat_lact_free)
+        #         db.commit()
+        #         db.refresh(db_product)
 
-        results.append(db_product)
+        # results.append(db_product)
 
     file.file.close()
     return results

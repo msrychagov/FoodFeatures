@@ -29,7 +29,10 @@ final class ScanService {
             
             do {
                 let decoder = JSONDecoder()
-                let scannedProduct = try decoder.decode(ScannedProductResponse.self, from: data)
+                var scannedProduct = try decoder.decode(ScannedProductResponse.self, from: data)
+                scannedProduct.product.traces_tags = FieldsParser().parseTags(tags: scannedProduct.product.traces_tags!)
+                scannedProduct.product.allergens_tags = FieldsParser().parseTags(tags: scannedProduct.product.allergens_tags!)
+                
                 completion(.success(scannedProduct))
             } catch {
                 completion(.failure(error))
