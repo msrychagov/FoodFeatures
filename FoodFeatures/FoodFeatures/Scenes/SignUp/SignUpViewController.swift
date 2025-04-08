@@ -99,7 +99,7 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         preferencesLabel.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         preferencesLabel.font = .systemFont(ofSize: 22, weight: .bold)
         preferencesLabel.textAlignment = .center
-        preferencesLabel.text = "Выберите пищевые ограничения:"
+        preferencesLabel.text = "Пищевые ограничения:"
     }
     private func configurePreferencesTableView() {
         preferencesTableView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
@@ -121,8 +121,8 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
         }
         view.addSubview(stackView)
         stackView.pinCenterX(to: view.centerXAnchor)
-        stackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 48)
-        stackView.pinBottom(to: signUpButton.topAnchor, 48)
+        stackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 32)
+        stackView.pinBottom(to: signUpButton.topAnchor, 32)
         stackView.setWidth(300)
     }
     
@@ -158,7 +158,18 @@ final class SignUpViewController: UIViewController, SignUpViewLogic {
     func displaySignUpSuccess(viewModel: SignUpModels.SignUp.ViewModelSuccess) {
         // Здесь можно, например, показать сообщение об успехе, а затем выполнить переход:
         print("Токен получен: \(viewModel.token)")
-        interactor.routeToProfile(request: SignUpModels.routeToProfile.Request(navigationController: self.navigationController!))
+        guard
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let sceneDelegate = windowScene.delegate as? SceneDelegate,
+            let navigationController = sceneDelegate.window?.rootViewController as? UINavigationController,
+            let mainTabBar = navigationController.viewControllers.first as? MainTabBarController
+        else {
+            print("Неудача")
+            return
+        }
+        
+        mainTabBar.switchToAuth()
+        self.dismiss(animated: true)
     }
     
     // При ошибке регистрации

@@ -4,13 +4,22 @@ final class MainTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Назначаем контроллеры таб-бара
+        if AuthManager.shared.isLoggedIn() {
+            viewControllers = loggedUserTabBar()
+        } else {
+            viewControllers = unauthUserTabBar()
+        }
         
+        // Настраиваем внешний вид таб-бара
+        setupTabBarAppearance()
+    }
+    
+    func loggedUserTabBar() -> [UINavigationController] {
         let marketsVC = MarketsAssembly.build()
-        let favoritesVC = FavoritesAssembly.build()
         let scannerVC = ScannerAssembly.build()
+        let favoritesVC = FavoritesAssembly.build()
         let profileVC = ProfileAssembly.build()
-        
-        // Задаём каждому контроллеру UITabBarItem
         
         marketsVC.tabBarItem = UITabBarItem(
             title: "Магазины",
@@ -36,17 +45,58 @@ final class MainTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "person.fill")
         )
         
-        // Оборачиваем каждый контроллер в UINavigationController, если нужно
         let scannerNav = UINavigationController(rootViewController: scannerVC)
         let marketsNav = UINavigationController(rootViewController: marketsVC)
         let favoritesNav = UINavigationController(rootViewController: favoritesVC)
         let profileNav = UINavigationController(rootViewController: profileVC)
         
-        // Назначаем контроллеры таб-бара
-        viewControllers = [marketsNav, scannerNav, favoritesNav, profileNav]
+        return [marketsNav, scannerNav, favoritesNav, profileNav]
+    }
+    
+    func unauthUserTabBar() -> [UINavigationController] {
+        let marketsVC = MarketsAssembly.build()
+        let scannerVC = ScannerAssembly.build()
+        let unAuthorizedProfileVC = UnAuthorizedUserAssembly.build()
+        let unAuthorizedFavoritesVC = UnAuthorizedUserAssembly.build()
         
-        // Настраиваем внешний вид таб-бара
-        setupTabBarAppearance()
+        marketsVC.tabBarItem = UITabBarItem(
+            title: "Магазины",
+            image: UIImage(systemName: "basket.fill"),
+            selectedImage: UIImage(systemName: "basket.fill")
+        )
+        
+        scannerVC.tabBarItem = UITabBarItem(
+            title: "Сканер",
+            image: UIImage(systemName: "barcode"),
+            selectedImage: UIImage(systemName: "barcode")
+        )
+        
+        unAuthorizedFavoritesVC.tabBarItem = UITabBarItem(
+            title: "Избранное",
+            image: UIImage(systemName: "heart.fill"),
+            selectedImage: UIImage(systemName: "heart.fill")
+        )
+        
+        unAuthorizedProfileVC.tabBarItem = UITabBarItem(
+            title: "Профиль",
+            image: UIImage(systemName: "person.fill"),
+            selectedImage: UIImage(systemName: "person.fill")
+        )
+        
+        let scannerNav = UINavigationController(rootViewController: scannerVC)
+        let marketsNav = UINavigationController(rootViewController: marketsVC)
+        let unAuthorizedFavoritesNav = UINavigationController(rootViewController: unAuthorizedFavoritesVC)
+        let unAuthorizedProfileNav = UINavigationController(rootViewController: unAuthorizedProfileVC)
+        
+        return [marketsNav, scannerNav, unAuthorizedFavoritesNav, unAuthorizedProfileNav]
+    }
+    
+    func switchToAuth() {
+        viewControllers = loggedUserTabBar()
+    }
+    
+    func switchToUnauth() {
+        viewControllers = unauthUserTabBar()
     }
     
     private func setupTabBarAppearance() {

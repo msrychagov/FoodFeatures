@@ -7,7 +7,7 @@
 
 final class ScannedProductWorker: ScannedProductWorkerLogic {
     func loadProduct(barcode: String, completion: @escaping (Result<ScannedProductResponse, any Error>) -> Void) {
-        ScanService().fetchScannedProduct(barcode: barcode) { result in
+        ScanService().fetchScannedProduct(barcode: "4607177073088") { result in
             completion(result)}
     }
     

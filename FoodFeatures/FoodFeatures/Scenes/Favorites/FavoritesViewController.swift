@@ -2,6 +2,14 @@ import UIKit
 
 class FavoritesViewController: UIViewController, FavoritesViewLogic{
     
+    //MARK: - Constants
+    enum Constants {
+        enum NavigationBar {
+            static let title: String = "Избранное"
+            static let textColor: UIColor = .black
+            static let font: UIFont = .systemFont(ofSize: 20, weight: .bold)
+        }
+    }
     private let interactor: FavoritesBuisnessLogic
     private let tableView = UITableView()
     private var favorites: [Product] = []
@@ -49,6 +57,15 @@ class FavoritesViewController: UIViewController, FavoritesViewLogic{
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let appearance = UINavigationBarAppearance()
+            // Убираем полупрозрачность и ставим нужные цвета
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+            appearance.shadowColor = .clear
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
         title = "Избранное"
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
         configureUI()
@@ -56,7 +73,7 @@ class FavoritesViewController: UIViewController, FavoritesViewLogic{
     
     private func configureUI() {
         view.addSubview(collectionView)
-        
+        configureNavigationBar()
         NSLayoutConstraint.activate([
                 collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
                 collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -64,6 +81,16 @@ class FavoritesViewController: UIViewController, FavoritesViewLogic{
                 collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ])
     }
+    
+    private func configureNavigationBar() {
+        navigationController?.navigationBar.tintColor = Constants.NavigationBar.textColor
+        navigationItem.title = Constants.NavigationBar.title
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: Constants.NavigationBar.textColor,
+            .font: Constants.NavigationBar.font
+        ]
+    }
+    
     private func configureCollectionView() {
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.itemSize = CGSize(width: 180, height: 250)

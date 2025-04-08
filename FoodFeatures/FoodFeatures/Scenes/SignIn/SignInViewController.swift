@@ -37,6 +37,8 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     private let signInButton: UIButton = UIButton(type: .system)
     private let authService = AuthService()
     
+    var onLoginSuccess: (() -> Void)?
+    
     //MARK: Lyfecycles
     init (interactor: SignInBuisnessLogic) {
         self.interactor = interactor
@@ -95,12 +97,12 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     private func configureEmailView() {
         view.addSubview(emailView)
         emailView.pinCenterX(to: view)
-        emailView.pinCenterY(to: view)
+        emailView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 32)
     }
     
     private func configurePasswordView() {
         view.addSubview(passwordView)
-        passwordView.pinTop(to: emailView.bottomAnchor, 20)
+        passwordView.pinTop(to: emailView.bottomAnchor, 32)
         passwordView.pinCenterX(to: view)
         
     }
@@ -114,62 +116,53 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     }
     
     func displaySignInSuccess(viewModel: SignInModles.SignIn.ViewModelSuccess) {
-        print(AuthManager.shared.getToken())
-        interactor.routeToProfile(request: SignInModles.routeToProfile.Request(navigationController: self.navigationController!))
+        //        print(AuthManager.shared.getToken())
+        //        interactor.routeToProfile(request: SignInModles.routeToProfile.Request(navigationController:
+        print(AuthManager.shared.isLoggedIn())
+        guard
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let sceneDelegate = windowScene.delegate as? SceneDelegate,
+            let navigationController = sceneDelegate.window?.rootViewController as? UINavigationController,
+            let mainTabBar = navigationController.viewControllers.first as? MainTabBarController
+        else {
+            print("Неудача")
+            return
         }
-
-        // Ошибка авторизации
+        
+        mainTabBar.switchToAuth()
+        self.dismiss(animated: true)
+    }
+    
+    // Ошибка авторизации
     func displaySignInFailure(viewModel: SignInModles.SignIn.ViewModelFailure) {
-            // Показываем алерт с текстом ошибки
-            showAlert(message: viewModel.errorMessage)
-        }
+        // Показываем алерт с текстом ошибки
+        showAlert(message: viewModel.errorMessage)
+    }
     
     
     //MARK: - Actions
     @objc private func signInButtonTapped() {
         guard
-                    let username = emailView.textField.text,
-                    let password = passwordView.textField.text,
-                    !username.isEmpty,
-                    !password.isEmpty
-                else {
-                    showAlert(message: "Введите имя пользователя/почту и пароль")
-                    return
-                }
-                
-                // 2. Формируем Request и отправляем в Interactor
+            let username = emailView.textField.text,
+            let password = passwordView.textField.text,
+            !username.isEmpty,
+            !password.isEmpty
+        else {
+            showAlert(message: "Введите имя пользователя/почту и пароль")
+            return
+        }
+        
+        // 2. Формируем Request и отправляем в Interactor
         let request = SignInModles.SignIn.Request(
-                    username: username,
-                    password: password
-                )
+            username: username,
+            password: password
+        )
         interactor.signIn(request: request)
-//        guard let username = emailView.textField.text, !emailView.textField.text!.isEmpty,
-//              let password = passwordView.textField.text, !passwordView.textField.text!.isEmpty
-//                else {
-//                    showAlert(message: "Введите имя пользователя/почту и пароль")
-//                    return
-//                }
-//        authService.login(username: username, password: password) { result in
-//                    DispatchQueue.main.async {
-//                        switch result {
-//                        case .success(let tokenResponse):
-//                            // Успешный вход. Можем сохранить токен, перейти в приложение и т.п.
-//                            AuthManager.shared.saveToken(tokenResponse.access_token)
-//                            self.interactor.routeToProfile(request: SignIn.routeToProfile.Request(navigationController: self.navigationController))
-//                            self.showAlert(
-//                                            message: "Токен: \(tokenResponse.access_token)")
-//                            // Или сохранить tokenResponse.access_token в UserDefaults или Keychain
-//                        case .failure(let error):
-//                            self.showAlert(
-//                                            message: error.localizedDescription)
-//                        }
-//                    }
-//                }
         
     }
     
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
-
+    
 }

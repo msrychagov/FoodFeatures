@@ -29,7 +29,7 @@ final class EditorViewController: UIViewController, EditorViewLogic {
             static let bottomConstant: CGFloat = 15
         }
         enum NavigationBar {
-            static let title: String = "Регистрация"
+            static let title: String = "Редактирование профиля"
             static let textColor: UIColor = .black
             static let font: UIFont = .systemFont(ofSize: 20, weight: .bold)
         }
@@ -74,17 +74,27 @@ final class EditorViewController: UIViewController, EditorViewLogic {
     }
     
     private func configureUI() {
+        configureNavigationBar()
         configureSaveButton()
         configurePreferencesLabel()
         configurePreferencesTableView()
         configureStackView()
     }
     
+    private func configureNavigationBar() {
+        navigationController?.navigationBar.tintColor = Constants.NavigationBar.textColor
+        navigationItem.title = Constants.NavigationBar.title
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: Constants.NavigationBar.textColor,
+            .font: Constants.NavigationBar.font
+        ]
+    }
+    
     private func configurePreferencesLabel() {
         preferencesLabel.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         preferencesLabel.font = .systemFont(ofSize: 22, weight: .bold)
         preferencesLabel.textAlignment = .center
-        preferencesLabel.text = "Выберите пищевые ограничения:"
+        preferencesLabel.text = "Пищевые ограничения:"
     }
     private func configurePreferencesTableView() {
         preferencesTableView.translatesAutoresizingMaskIntoConstraints = Constants.Other.translatesAutoresizingMaskIntoConstraints
@@ -106,8 +116,8 @@ final class EditorViewController: UIViewController, EditorViewLogic {
         }
         view.addSubview(stackView)
         stackView.pinCenterX(to: view.centerXAnchor)
-        stackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 48)
-        stackView.pinBottom(to: saveButton.topAnchor, 48)
+        stackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 24)
+        stackView.pinBottom(to: saveButton.topAnchor, 32)
         stackView.setWidth(300)
     }
     

@@ -37,8 +37,7 @@ final class ScannedProductViewController: UIViewController, ScannedProductViewLo
     //MARK: Lyfecycles
     init (interactor: ScannedProductBuisnessLogic) {
         self.interactor = interactor
-        super.init(nibName: nil, bundle: nil)
-    }
+        super.init(nibName: nil, bundle: nil)    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -48,8 +47,20 @@ final class ScannedProductViewController: UIViewController, ScannedProductViewLo
     override func viewDidLoad() {
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
         super.viewDidLoad()
+        let appearance = UINavigationBarAppearance()
+            // Убираем полупрозрачность и ставим нужные цвета
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .clear
+            appearance.shadowColor = .clear
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
+            navigationController?.navigationBar.tintColor = .black
+            
         interactor.loadProduct()
     }
+
     
     //MARK: - Configures
     func configure(viewModel: ScannedProductModels.LoadProduct.Success.ViewModel) {
@@ -72,6 +83,10 @@ final class ScannedProductViewController: UIViewController, ScannedProductViewLo
         configureNameStack()
         configureAllergenStack()
         configureTracesStack()
+    }
+    
+    func configureNavidationBar() {
+        navigationItem.titleView?.tintColor = .black
     }
     
     func configureScrollView() {

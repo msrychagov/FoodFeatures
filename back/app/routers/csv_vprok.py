@@ -65,7 +65,6 @@ def upload_vprok_milk_csv(
         product_name = row.get("Заголовок") or "Без имени"
         description = row.get("Описание") or "Без описания"
         image_url = row.get("Изображения") or ""
-        specificies = row.get("Особенности") or "Без особенностей"
         fat_content = row.get("Жирность") or "Без жирности"
         volume = row.get("Объем") or "Без объема"
         compound = row.get("Состав") or "Без состава"
@@ -91,7 +90,7 @@ def upload_vprok_milk_csv(
                 fat_content=fat_content,
                 volume=volume,
                 compound=compound,
-                energy_value=energy_value + "Ккал",
+                energy_value=energy_value + " Ккал",
                 protein=protein,
                 fats=fats,
                 carbs=carbs,

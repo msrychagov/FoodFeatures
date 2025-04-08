@@ -38,6 +38,15 @@ final class MarketsViewController: UIViewController, MarketsViewLogic {
     //MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        let appearance = UINavigationBarAppearance()
+            // Убираем полупрозрачность и ставим нужные цвета
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+            appearance.shadowColor = .clear
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
         if #available(iOS 11.0, *) {
             table.contentInsetAdjustmentBehavior = .never
         } else {

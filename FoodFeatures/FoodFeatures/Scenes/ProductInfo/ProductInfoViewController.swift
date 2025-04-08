@@ -122,20 +122,20 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
         configureDescriptionInfoView()
         configureNutritionalValueInfoView()
         configureInfoViewsStack()
-        }
+    }
     
     private func configureScrollView() {
         scrollView.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         view.addSubview(scrollView)
-//        scrollView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-//        scrollView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
-//        scrollView.pinHorizontal(to: view)
+        //        scrollView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        //        scrollView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
+        //        scrollView.pinHorizontal(to: view)
         NSLayoutConstraint.activate([
-                scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
     private func configureContentView() {
@@ -214,13 +214,13 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
     
     private func configureGeneralCharacteristicsInfoView() {
         generalCharacteristicsInfoView.configure(title: "Общие характеристики",
-            descriptionfields: [DescriptionField(title: "Особенности", value: product.specificies)])
+                                                 descriptionfields: [DescriptionField(title: "Особенности", value: product.specificies)])
     }
     
     private func configureDescriptionInfoView() {
         descriptionInfoView.configure(title: "Описание",
                                       descriptionfields: [DescriptionField(title: "Состав", value: product.compound)]
-            )
+        )
     }
     
     private func configureNutritionalValueInfoView() {
@@ -267,49 +267,52 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
     }
     //MARK: - Actions
     @objc private func addToFavoriteTapped() {
-//        let request = ProductInfoModels.ToggleFavorite.Request(
-//            productId: product.id!,
-//                    isCurrentlyFavorite: isFavorite
-//                )
-//        interactor.toggleFavorite(request: request)
-        
-                if !likeButton.isSelected {
-                    likeButton.tintColor = Constants.LikeButton.selectedTintColor
-                    let productId = product.id
-        
-                    // Вызываем наш сервис, который добавляет товар в избранное
-                    FavoriteService().addToFavorites(productId: productId!) { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success:
-                                NotificationCenter.default.post(name: Notification.Name(Constants.Notification.addName), object: self.product)
-                                // Успешно добавили
-        //                        self.showAlert(title: "Успех", message: "Товар добавлен в избранное!")
-                            case .failure(let error):
-                                // Обработка ошибки
-                                self.showAlert(title: "Ошибка", message: "Не удалось добавить в избранное: \(error.localizedDescription)")
-                            }
-                        }
-                    }
-                } else {
-                    likeButton.tintColor = Constants.LikeButton.normalTintColor
-                    let productId = product.id
-        
-                    FavoriteService().removeFromFavorites(productId: Int(productId!)) { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success:
-                                // Успешно добавили
-                                NotificationCenter.default.post(name: Notification.Name(Constants.Notification.removeName), object: self.product.id)
-                                // Отправляем уведомление, что товар удалён
-                            case .failure(let error):
-                                // Обработка ошибки
-                                self.showAlert(title: "Ошибка", message: "Не удалось удалить товар из избранного: \(error.localizedDescription)")
-                            }
+        //        let request = ProductInfoModels.ToggleFavorite.Request(
+        //            productId: product.id!,
+        //                    isCurrentlyFavorite: isFavorite
+        //                )
+        //        interactor.toggleFavorite(request: request)
+        if !AuthManager.shared.isLoggedIn() {
+            showAlert(title: "Невозможно добавить товар в изюранное", message: "Войдите или зарегистрируйтесь")
+        } else {
+            if !likeButton.isSelected {
+                likeButton.tintColor = Constants.LikeButton.selectedTintColor
+                let productId = product.id
+                
+                // Вызываем наш сервис, который добавляет товар в избранное
+                FavoriteService().addToFavorites(productId: productId!) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success:
+                            NotificationCenter.default.post(name: Notification.Name(Constants.Notification.addName), object: self.product)
+                            // Успешно добавили
+                            //                        self.showAlert(title: "Успех", message: "Товар добавлен в избранное!")
+                        case .failure(let error):
+                            // Обработка ошибки
+                            self.showAlert(title: "Ошибка", message: "Не удалось добавить в избранное: \(error.localizedDescription)")
                         }
                     }
                 }
-        likeButton.isSelected.toggle()
+            } else {
+                likeButton.tintColor = Constants.LikeButton.normalTintColor
+                let productId = product.id
+                
+                FavoriteService().removeFromFavorites(productId: Int(productId!)) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success:
+                            // Успешно добавили
+                            NotificationCenter.default.post(name: Notification.Name(Constants.Notification.removeName), object: self.product.id)
+                            // Отправляем уведомление, что товар удалён
+                        case .failure(let error):
+                            // Обработка ошибки
+                            self.showAlert(title: "Ошибка", message: "Не удалось удалить товар из избранного: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+            likeButton.isSelected.toggle()
+        }
     }
     
     
@@ -317,7 +320,10 @@ final class ProductInfoViewController: UIViewController, ProductInfoViewLogic {
     
     private func showAlert(title: String, message: String) {
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        let okAction = UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.navigationController?.present(AuthAssembly.build(), animated: true)
+        }
+        ac.addAction(okAction)
         present(ac, animated: true)
     }
 }

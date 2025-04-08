@@ -19,13 +19,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         let window = UIWindow(windowScene: windowScene)
-        if AuthManager.shared.isLoggedIn() {
-            let tabBar = MainTabBarController()
-            tabBar.selectedIndex = 0
-            window.rootViewController = UINavigationController(rootViewController: tabBar)
-        } else {
-            window.rootViewController = UINavigationController(rootViewController: AuthorizationAssembly.build())
-        }
+        let tabBar = MainTabBarController()
+        tabBar.selectedIndex = 0
+        window.rootViewController = UINavigationController(rootViewController: tabBar)
+//        if AuthManager.shared.isLoggedIn() {
+//            let tabBar = MainTabBarController()
+//            tabBar.selectedIndex = 0
+//            window.rootViewController = UINavigationController(rootViewController: tabBar)
+//        } else {
+//            window.rootViewController = UINavigationController(rootViewController: AuthorizationAssembly.build())
+//        }
         
         self.window = window
         window.makeKeyAndVisible()

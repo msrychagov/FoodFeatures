@@ -31,6 +31,7 @@ final class ScannerViewController: UIViewController, ScannerViewLogic {
     //MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = ""
         let request = ScannerModels.Setup.Request(view: view)
         interactor.startScanning(request: request)
         configureUI()

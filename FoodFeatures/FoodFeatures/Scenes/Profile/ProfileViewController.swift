@@ -43,6 +43,11 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
             static let errorTitle: String = "Ошибка"
             static let completeTitle: String = "Ок"
         }
+        enum NavigationBar {
+            static let title: String = ""
+            static let textColor: UIColor = .black
+            static let font: UIFont = .systemFont(ofSize: 20, weight: .bold)
+        }
     }
     
     //MARK: - Variables
@@ -84,10 +89,20 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
     }
 
     private func configureUI() {
+        configureNavigationBar()
         configureSignOutButton()
         configureEditButton()
         configureInfoView()
         configurePreferencesTableView()
+    }
+    
+    private func configureNavigationBar() {
+        navigationController?.navigationBar.tintColor = Constants.NavigationBar.textColor
+        navigationItem.title = Constants.NavigationBar.title
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: Constants.NavigationBar.textColor,
+            .font: Constants.NavigationBar.font
+        ]
     }
     
     private func configurePreferencesTableView() {
@@ -177,17 +192,28 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
         do {
             
             try AuthManager.shared.clearToken()
-            
-            // Создаем новый экран авторизации
-            let signInVC = AuthorizationAssembly.build()
-            let navController = UINavigationController(rootViewController: signInVC)
-            
-            // Делаем его корневым контроллером
-            if let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate {
-                sceneDelegate.window?.rootViewController = navController
-            } else {
-                UIApplication.shared.windows.first?.rootViewController = navController
+            guard
+                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                let sceneDelegate = windowScene.delegate as? SceneDelegate,
+                let navigationController = sceneDelegate.window?.rootViewController as? UINavigationController,
+                let mainTabBar = navigationController.viewControllers.first as? MainTabBarController
+            else {
+                print("Неудача")
+                return
             }
+            
+            mainTabBar.switchToUnauth()
+            navigationController.present(AuthAssembly.build(), animated: true)
+            // Создаем новый экран авторизации
+//            let signInVC = AuthorizationAssembly.build()
+//            let navController = UINavigationController(rootViewController: signInVC)
+//            
+//            // Делаем его корневым контроллером
+//            if let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate {
+//                sceneDelegate.window?.rootViewController = navController
+//            } else {
+//                UIApplication.shared.windows.first?.rootViewController = navController
+//            }
             
         } catch let error {
             print("Ошибка выхода: \(error.localizedDescription)")
