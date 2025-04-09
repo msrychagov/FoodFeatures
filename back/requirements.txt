@@ -5,3 +5,5 @@ sqlalchemy
 psycopg2-binary
 passlib
 pyjwt
+pydantic[email]
+python-multipart
