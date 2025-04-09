@@ -7,7 +7,7 @@ protocol ScannedProductBuisnessLogic {
 //MARK: - PresenterProtocol
 protocol ScannedProductPresenterLogic {
     func presentScanSuccess(response: ScannedProductModels.LoadProduct.Response)
-    func presentScanFailure(error: Error)
+    func presentScanFailure(error: String)
     func goBackToScanner(response: ScannedProductModels.GoBackToScanner.Response)
 }
 

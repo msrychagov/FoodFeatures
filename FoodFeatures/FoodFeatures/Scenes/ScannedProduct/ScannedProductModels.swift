@@ -5,6 +5,7 @@ enum ScannedProductModels {
         struct Response {
             var scannedProductResponse: ScannedProductResponse
             var compatible: Bool
+            var auth: Bool
         }
         enum Success {
             struct ViewModel {
@@ -17,7 +18,7 @@ enum ScannedProductModels {
         }
         enum Failure {
             struct Response {
-                var error: Error
+                var error: String
             }
             struct ViewModel {
                 var errorMessage: String

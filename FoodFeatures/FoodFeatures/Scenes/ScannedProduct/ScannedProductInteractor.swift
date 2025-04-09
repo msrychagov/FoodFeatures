@@ -10,9 +10,15 @@ final class ScannedProductInteractor: ScannedProductBuisnessLogic {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let product):
-                    self!.checkRestrictions(product: product)
+                    if AuthManager.shared.isLoggedIn() {
+                        self?.getUser()
+                        self?.checkRestrictions(product: product)
+                    } else {
+                        let response = ScannedProductModels.LoadProduct.Response(scannedProductResponse: product, compatible: true, auth: false)
+                        self?.presenter.presentScanSuccess(response: response)
+                    }
                 case .failure(let error):
-                    self!.presenter.presentScanFailure(error: error)
+                    self!.presenter.presentScanFailure(error: "Продукт не найден")
                 }
             }
         }
@@ -33,21 +39,20 @@ final class ScannedProductInteractor: ScannedProductBuisnessLogic {
     init (presenter: ScannedProductPresenterLogic, barcode: String) {
         self.presenter = presenter
         self.barcode = barcode
-        getUser()
     }
     
     //MARK: Methods
     private func getUser() {
-        AuthService().fetchCurrentUser(accessToken: AuthManager.shared.getToken()!) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let user):
-                    self?.user = user
-                case .failure(let error):
-                    print("Говно: \(error)")
+            AuthService().fetchCurrentUser(accessToken: AuthManager.shared.getToken()!) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let user):
+                        self?.user = user
+                    case .failure(let error):
+                        print("Говно: \(error)")
+                    }
                 }
             }
-        }
     }
     
     private func checkRestrictions(product: ScannedProductResponse) {
@@ -56,10 +61,10 @@ final class ScannedProductInteractor: ScannedProductBuisnessLogic {
         let intersectionSet = Set(allergens).intersection(userRestrictions)
         switch intersectionSet.isEmpty {
             case true:
-            let response = ScannedProductModels.LoadProduct.Response(scannedProductResponse: product, compatible: true)
+            let response = ScannedProductModels.LoadProduct.Response(scannedProductResponse: product, compatible: true, auth: true)
             self.presenter.presentScanSuccess(response: response)
         case false:
-            let response = ScannedProductModels.LoadProduct.Response(scannedProductResponse: product, compatible: false)
+            let response = ScannedProductModels.LoadProduct.Response(scannedProductResponse: product, compatible: false, auth: true)
             self.presenter.presentScanSuccess(response: response)
         }
     }

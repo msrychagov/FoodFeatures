@@ -5,22 +5,26 @@ final class ScannedProductPresenter: ScannedProductPresenterLogic {
         response.navigationController!.popViewController(animated: true)
     }
     
-    func presentScanFailure(error: any Error) {
-        let viewModel = ScannedProductModels.LoadProduct.Failure.ViewModel(errorMessage: "Продукт не найден")
+    func presentScanFailure(error: String) {
+        let viewModel = ScannedProductModels.LoadProduct.Failure.ViewModel(errorMessage: error)
         view?.displayScanFailure(viewModel: viewModel)
     }
     
     func presentScanSuccess(response: ScannedProductModels.LoadProduct.Response) {
         let product = response.scannedProductResponse.product
         let compatible = response.compatible
+        let auth = response.auth
         let allergensArray = getAllergenArray(allergensStringArray: product.allergens_tags ?? [])
         var message: String
         
         switch compatible {
         case true:
-            message = "Продукт заебись"
+            switch auth {
+            case false: message = "Вы не авторизованы"
+            case true: message = "Продукт вам подходит"
+            }
         case false:
-            message = "Продукт дерьмо"
+            message = "Продукт вам не подходит"
         }
         
         let viewModel = ScannedProductModels.LoadProduct.Success.ViewModel(
