@@ -5,7 +5,7 @@ final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Назначаем контроллеры таб-бара
-        if !AuthManager.shared.isLoggedIn() {
+        if AuthManager.shared.isLoggedIn() {
             viewControllers = loggedUserTabBar()
         } else {
             viewControllers = unauthUserTabBar()

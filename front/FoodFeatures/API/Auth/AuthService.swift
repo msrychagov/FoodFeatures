@@ -3,7 +3,7 @@ import Foundation
 class AuthService {
     
     func register(name: String, preferences: [String], email: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
-        guard let url = URL(string: "\(GeneralConstants.baseURL)/register") else {
+        guard let url = URL(string: "\(GeneralConstants.baseURL)/user/register") else {
             completion(.failure(NSError(domain: "Invalid URL", code: 0)))
             return
         }
@@ -56,7 +56,7 @@ class AuthService {
     
     // Пример метода регистрации мы уже делали, теперь логин:
     func login(username: String, password: String, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
-        guard let url = URL(string: "\(GeneralConstants.baseURL)/login") else {
+        guard let url = URL(string: "\(GeneralConstants.baseURL)/user/login") else {
             completion(.failure(NSError(domain: "Invalid URL", code: 0)))
             return
         }
@@ -114,7 +114,7 @@ class AuthService {
     
     func fetchCurrentUser(accessToken: String, completion: @escaping (Result<User, Error>) -> Void) {
         // Замените URL на ваш реальный эндпоинт
-        guard let url = URL(string: "\(GeneralConstants.baseURL)/users/me") else {
+        guard let url = URL(string: "\(GeneralConstants.baseURL)/user/me") else {
             completion(.failure(NSError(domain: "Invalid url", code: 0)))
             return
         }

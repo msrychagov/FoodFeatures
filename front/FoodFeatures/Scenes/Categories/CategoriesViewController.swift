@@ -108,7 +108,7 @@ extension CategoriesViewController: UICollectionViewDataSource {
 extension CategoriesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCategory = categories[indexPath.item]
-        let categoryProductsVC = ProductsListAssembly.build(marketId: self.market.id, categoryId: selectedCategory.id, chapter: chapter)
+        let categoryProductsVC = ProductsListAssembly.build(marketId: self.market.id, category: selectedCategory, chapter: chapter)
         
         navigationController?.pushViewController(categoryProductsVC, animated: true)
         print("Вы выбрали категорию: \(selectedCategory.title)")

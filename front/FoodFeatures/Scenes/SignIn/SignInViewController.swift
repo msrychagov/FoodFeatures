@@ -136,7 +136,9 @@ final class SignInViewController: UIViewController, SignInViewLogic {
     // Ошибка авторизации
     func displaySignInFailure(viewModel: SignInModles.SignIn.ViewModelFailure) {
         // Показываем алерт с текстом ошибки
-        showAlert(message: viewModel.errorMessage)
+        if viewModel.errorMessage.contains("401") {
+            showAlert(message: "Ошибка авторизации")
+        }
     }
     
     

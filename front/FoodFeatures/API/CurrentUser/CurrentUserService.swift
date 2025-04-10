@@ -8,7 +8,7 @@ import Foundation
 
 class CurrentUserService {
     func updateCurrentUser(name: String, email: String, preferences: [String], completion: @escaping ((Result<User, Error>) -> Void)) {
-        let url = URL(string: "\(GeneralConstants.baseURL)/users/me/update")
+        let url = URL(string: "\(GeneralConstants.baseURL)/user/me/update")
         var request = URLRequest(url: url!)
         request.httpMethod = "PUT"
         

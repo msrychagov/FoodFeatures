@@ -17,14 +17,14 @@ final class ScannedProductPresenter: ScannedProductPresenterLogic {
         let allergensArray = getAllergenArray(allergensStringArray: product.allergens_tags ?? [])
         var message: String
         
-        switch compatible {
+        switch auth {
         case true:
-            switch auth {
-            case false: message = "Вы не авторизованы"
-            case true: message = "Продукт вам подходит"
+            switch compatible {
+            case true: message = "Продукт вам не подходит"
+            case false: message = "Продукт вам подходит"
             }
         case false:
-            message = "Продукт вам не подходит"
+            message = "Вы не авторизованы"
         }
         
         let viewModel = ScannedProductModels.LoadProduct.Success.ViewModel(

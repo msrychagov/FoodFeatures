@@ -191,7 +191,7 @@ final class ProfileViewController: UIViewController, ProfileViewLogic {
     @objc private func signOutButtonTapped() {
         do {
             
-            try AuthManager.shared.clearToken()
+            AuthManager.shared.clearToken()
             guard
                 let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                 let sceneDelegate = windowScene.delegate as? SceneDelegate,

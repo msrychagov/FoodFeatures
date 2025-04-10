@@ -27,17 +27,17 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic{
     
     //MARK: - Variables
     var storeId: Int
-    var categoryId: Int
+    var category: Category
     var chapter: String
     let interactor: ProductsBuisnessLogic
     private let collectionView: UICollectionView = UICollectionView(frame: .zero,
                                                                     collectionViewLayout: UICollectionViewFlowLayout())
     // Массив товаров
     var displayedProducts: [Product] = []
-    init(interactor: ProductsBuisnessLogic, marketId: Int, categoryId: Int, chapter: String) {
+    init(interactor: ProductsBuisnessLogic, marketId: Int, category: Category, chapter: String) {
         self.interactor = interactor
         self.storeId = marketId
-        self.categoryId = categoryId
+        self.category = category
         self.chapter = chapter
         super.init(nibName: nil, bundle: nil)
     }
@@ -65,14 +65,14 @@ class ProductsListViewController: UIViewController, ProductsListViewLogic{
             object: nil
         )
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
-        title = "Продукты"
+        title = category.title
         
         if chapter == "Default" {
-            let request = ProductsModels.Load.Request(storeId: storeId, categoryId: categoryId)
+            let request = ProductsModels.Load.Request(storeId: storeId, categoryId: category.id)
             interactor.loadProducts(request: request)
         }
         else {
-            let request = ProductsModels.Load.Request(storeId: storeId, categoryId: categoryId)
+            let request = ProductsModels.Load.Request(storeId: storeId, categoryId: category.id)
             interactor.loadFavoriteProducts(request: request)
         }
         // Начинаем загрузку
