@@ -14,7 +14,6 @@ struct TokenResponse: Codable {
 struct User: Codable {
     let id: Int
     let name: String
-//    let age: Int?
     let preferences: [String]?
     let email: String
 }

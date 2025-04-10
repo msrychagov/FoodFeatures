@@ -10,5 +10,5 @@ enum GeneralConstants {
     static let viewControllerBackgroundColor: UIColor = UIColor(red: 192/255, green: 114/255, blue: 114/255, alpha: 1)
     static let buttonsBackgroundColor: UIColor = UIColor(red: 199/255, green: 60/255, blue: 63/255, alpha: 1)
     static let translatesAutoresizingMaskIntoConstraints: Bool = false
-    static let baseURL = "http://10.193.90.161:8000"
+    static let baseURL = "http://192.168.1.227:8000"
 }

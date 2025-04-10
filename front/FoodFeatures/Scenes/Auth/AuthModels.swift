@@ -1,6 +1,0 @@
-import UIKit
-
-enum Auth {
-
-}
-

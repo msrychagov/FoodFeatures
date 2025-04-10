@@ -4,48 +4,45 @@ class FavoritesViewController: UIViewController, FavoritesViewLogic{
     
     //MARK: - Constants
     enum Constants {
+        static let chapter: String = "Favorites"
         enum NavigationBar {
             static let title: String = "Избранное"
             static let textColor: UIColor = .black
-            static let font: UIFont = .systemFont(ofSize: 20, weight: .bold)
+            static let font: UIFont = .systemFont(ofSize: 1, weight: .bold)
         }
+        enum CollectionView {
+            static let sectionInset: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16)
+            static let minimumInteritemSpacing: CGFloat = 16
+            static let minimumLineSpacing: CGFloat = 16
+            static let heightAndWidthDifference: CGFloat = 48
+            static let backgroundColor: UIColor = .clear
+            static let numberOfRows: CGFloat = 2
+        }
+        
     }
     private let interactor: FavoritesBuisnessLogic
+    private var markets: [Market] = []
     private let tableView = UITableView()
-    private var favorites: [Product] = []
-    private let markets: [Market] = [
-        Market(title: "Перекрёсток", image: "perekrestokFavorite", id: 1),
-        Market(title: "Лента", image: "lentaFavorite", id: 2),
-        Market(title: "Магнит", image: "magnitFavorite", id: 3)]
-    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         // Задаём отступы
-        layout.sectionInset = UIEdgeInsets(top: 16, left: 14, bottom: 14, right: 16)
-        layout.minimumInteritemSpacing = 10
-        layout.minimumLineSpacing = 10
+        layout.sectionInset = Constants.CollectionView.sectionInset
+        layout.minimumInteritemSpacing = Constants.CollectionView.minimumInteritemSpacing
+        layout.minimumLineSpacing = Constants.CollectionView.minimumLineSpacing
         
-        // Размер ячейки — подбирайте под свой дизайн
-        let itemWidth: CGFloat = (view.bounds.width - 14*3) / 2  // 2 колонки
-        layout.itemSize = CGSize(width: itemWidth, height: itemWidth + 40)
+        let itemWidth: CGFloat = (view.bounds.width - Constants.CollectionView.minimumInteritemSpacing - Constants.CollectionView.sectionInset.left - Constants.CollectionView.sectionInset.right) / Constants.CollectionView.numberOfRows
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth + Constants.CollectionView.heightAndWidthDifference)
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .clear
-        cv.translatesAutoresizingMaskIntoConstraints = false
+        cv.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         cv.dataSource = self
         cv.delegate = self
-        cv.register(
-            FavoriteMarketCell.self,
-            forCellWithReuseIdentifier: FavoriteMarketCell.reuseIdentifier
-        )
+        cv.register(FavoriteMarketCell.self, forCellWithReuseIdentifier: FavoriteMarketCell.reuseIdentifier)
         return cv
     }()
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-////        fetchFavoriteProducts()
-//    }
-    
+    //MARK: - Lyfecycle
     init (interactor: FavoritesBuisnessLogic) {
         self.interactor = interactor
         super.init(nibName: nil, bundle: nil)
@@ -54,65 +51,57 @@ class FavoritesViewController: UIViewController, FavoritesViewLogic{
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
+    //MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        let appearance = UINavigationBarAppearance()
-            // Убираем полупрозрачность и ставим нужные цвета
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
-            appearance.shadowColor = .clear
-            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
-
-            navigationController?.navigationBar.standardAppearance = appearance
-            navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        title = "Избранное"
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        interactor.setMarkets(request: Favorites.Markets.Request())
         configureUI()
     }
     
+    //MARK: - Methods
+    func displayMarkets(viewModel: Favorites.Markets.ViewModel) {
+        markets = viewModel.markets
+        collectionView.reloadData()
+    }
+    
+    //MARK: - Configure
     private func configureUI() {
-        view.addSubview(collectionView)
         configureNavigationBar()
-        NSLayoutConstraint.activate([
-                collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
+        configureCollectionView()
     }
     
     private func configureNavigationBar() {
+        let standardAppearance = UINavigationBarAppearance()
+        // Убираем полупрозрачность и ставим нужные цвета
+        standardAppearance.configureWithOpaqueBackground()
+        standardAppearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        standardAppearance.shadowColor = .black
+        standardAppearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+        
+        let scrollEdgeAppearance = UINavigationBarAppearance()
+        scrollEdgeAppearance.configureWithOpaqueBackground()
+        scrollEdgeAppearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        scrollEdgeAppearance.shadowColor = .clear
+        scrollEdgeAppearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+        
+        navigationController?.navigationBar.standardAppearance = standardAppearance
+        navigationController?.navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
+        
         navigationController?.navigationBar.tintColor = Constants.NavigationBar.textColor
         navigationItem.title = Constants.NavigationBar.title
-        navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: Constants.NavigationBar.textColor,
-            .font: Constants.NavigationBar.font
-        ]
     }
     
     private func configureCollectionView() {
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.itemSize = CGSize(width: 180, height: 250)
-            layout.minimumInteritemSpacing = 4
-            layout.minimumLineSpacing = 10
-            layout.invalidateLayout()
-        }
-        collectionView.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
-        collectionView.register(ProductsListCell.self, forCellWithReuseIdentifier: ProductsListCell.reuseIdentifier)
-        collectionView.backgroundColor = .green
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.alwaysBounceVertical = true
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.contentInset = .init(top: 10, left: 10, bottom: 10, right: 10)
-        collectionView.backgroundColor = .clear
         view.addSubview(collectionView)
-        collectionView.pin(to: view, 5)
+        collectionView.pin(to: view)
     }
     
 }
 
+
+//MARK: - CollectionViewDataSource
 extension FavoritesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return markets.count
@@ -131,10 +120,10 @@ extension FavoritesViewController: UICollectionViewDataSource {
     }
 }
 
+//MARK: - CollectionViewDelegate
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let market = markets[indexPath.item]
-        let categories = CategoriesAssembly.build(market: market, chapter: "Favorites")
-        navigationController?.pushViewController(categories, animated: true)
+        let request = Favorites.RouteToCategories.Request(navigationController: navigationController, market: self.markets[indexPath.item], chapter: Constants.chapter)
+        interactor.routeToCategories(request: request)
     }
 }

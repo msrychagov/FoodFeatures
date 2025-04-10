@@ -3,27 +3,26 @@ import UIKit
 final class MarketsViewController: UIViewController, MarketsViewLogic {
     //MARK: - Constants
     enum Constants {
-        enum Other {
-            static let translatesAutoresizingMaskIntoConstraints: Bool = false
-        }
+        static let chapter: String = "Default"
         enum NavigationBar {
             static let title: String = "Магазины"
             static let textColor: UIColor = .black
-            static let font: UIFont = .systemFont(ofSize: 20, weight: .bold)
         }
         enum TableView {
-            static let bottomConstraint: CGFloat = 10
-            static let horizontalConstraint: CGFloat = 10
+            static let backgroundColor: UIColor = .clear
+            static let separatorStyle: UITableViewCell.SeparatorStyle = .none
+            static let contentInset: UIEdgeInsets = UIEdgeInsets(top: 8,
+                                                                 left: 0,
+                                                                 bottom: 16,
+                                                                 right: 0)
+            static let horizontalConstraint: CGFloat = 16
         }
     }
     
     //MARK: - Variables
     private let interactor: MarketsBuisnessLogic
     private let table: UITableView = UITableView()
-    private let markets: [Market] = [
-        Market(title: "Перекрёсток", image: "perekrestok", id: 1),
-        Market(title: "Лента", image: "lenta", id: 2),
-        Market(title: "Магнит", image: "magnit", id: 3)]
+    private var markets: [Market] = []
     
     //MARK: Lyfecycles
     init (interactor: MarketsBuisnessLogic) {
@@ -35,54 +34,63 @@ final class MarketsViewController: UIViewController, MarketsViewLogic {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - Methods
+    //MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        let appearance = UINavigationBarAppearance()
-            // Убираем полупрозрачность и ставим нужные цвета
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
-            appearance.shadowColor = .clear
-            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
-
-            navigationController?.navigationBar.standardAppearance = appearance
-            navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        if #available(iOS 11.0, *) {
-            table.contentInsetAdjustmentBehavior = .never
-        } else {
-            automaticallyAdjustsScrollViewInsets = false
-        }
+        //        if #available(iOS 11.0, *) {
+        //            table.contentInsetAdjustmentBehavior = .never
+        //        } else {
+        //            automaticallyAdjustsScrollViewInsets = false
+        //        }
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        interactor.fetchMarkets(request: .init())
         configureUI()
     }
-    
+    //MARK: - Methods
+    func fetchMarkets(viewModel: Markets.FetchMarkets.ViewModel) {
+        self.markets = viewModel.markets
+        table.reloadData()
+    }
+    //MARK: - Configure
     private func configureUI() {
         configureTableView()
         configureNavigationBar()
     }
     
     private func configureNavigationBar() {
+        let standardAppearance = UINavigationBarAppearance()
+        // Убираем полупрозрачность и ставим нужные цвета
+        standardAppearance.configureWithOpaqueBackground()
+        standardAppearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        standardAppearance.shadowColor = .black
+        standardAppearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+        
+        let scrollEdgeAppearance = UINavigationBarAppearance()
+        scrollEdgeAppearance.configureWithOpaqueBackground()
+        scrollEdgeAppearance.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        scrollEdgeAppearance.shadowColor = .clear
+        scrollEdgeAppearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+        
+        navigationController?.navigationBar.standardAppearance = standardAppearance
+        navigationController?.navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
+        
         navigationController?.navigationBar.tintColor = Constants.NavigationBar.textColor
         navigationItem.title = Constants.NavigationBar.title
-        navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: Constants.NavigationBar.textColor,
-            .font: Constants.NavigationBar.font
-        ]
     }
-        
+    
     private func configureTableView() {
         table.register(MarketCell.self, forCellReuseIdentifier: MarketCell.reuseIdentifier)
-        table.backgroundColor = .clear
+        table.backgroundColor = Constants.TableView.backgroundColor
+        table.separatorStyle = Constants.TableView.separatorStyle
         table.dataSource = self
         table.delegate = self
-        table.rowHeight = UITableView.automaticDimension
-        table.separatorStyle = .none
+        table.contentInset = Constants.TableView.contentInset
+        //        table.rowHeight = UITableView.automaticDimension
         view.addSubview(table)
         table.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        table.pinBottom(to: view.bottomAnchor, Constants.TableView.bottomConstraint)
+        table.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
         table.pinHorizontal(to: view, Constants.TableView.horizontalConstraint)
     }
-    //MARK: - Actions
 }
 
 //MARK: - Extensions
@@ -107,9 +115,6 @@ extension MarketsViewController: UITableViewDataSource {
 extension MarketsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedMarket = markets[indexPath.item]
-        
-        interactor.routeToCategories(request: Markets.routeToCategories.Request(navigationController: self.navigationController, market: selectedMarket, chapter: "Default"))
-        print("Вы выбрали категорию: \(selectedMarket.title)")
-        // Тут можно, например, открыть детальный экран или фильтровать список продуктов
+        interactor.routeToCategories(request: Markets.RouteToCategories.Request(navigationController: self.navigationController, market: selectedMarket, chapter: Constants.chapter))
     }
 }

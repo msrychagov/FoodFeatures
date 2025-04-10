@@ -20,7 +20,7 @@ class MarketCell: UITableViewCell {
             static let backgroundColor: UIColor = .clear
         }
         enum Wrap {
-            static let verticalConstraint: CGFloat = 10
+            static let verticalConstraint: CGFloat = 8
         }
         enum ImageView {
             static let cornerRadius: CGFloat = 50
@@ -46,7 +46,7 @@ class MarketCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - Methods
+    //MARK: - Configure
     func configure(image: UIImage) {
         self.backgroundColor = Constants.General.backgroundColor
         // Сбрасываем предыдущий constraint (если ячейка переиспользуется)
@@ -74,7 +74,7 @@ class MarketCell: UITableViewCell {
     }
     
     private func configureWrap() {
-        wrap.translatesAutoresizingMaskIntoConstraints = false
+        wrap.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         contentView.addSubview(wrap)
         wrap.pinVertical(to: contentView, Constants.Wrap.verticalConstraint)
         wrap.pinHorizontal(to: contentView)

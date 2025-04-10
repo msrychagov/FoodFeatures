@@ -111,43 +111,5 @@ class AuthService {
         }
         .resume()
     }
-    
-    func fetchCurrentUser(accessToken: String, completion: @escaping (Result<User, Error>) -> Void) {
-        // Замените URL на ваш реальный эндпоинт
-        guard let url = URL(string: "\(GeneralConstants.baseURL)/user/me") else {
-            completion(.failure(NSError(domain: "Invalid url", code: 0)))
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        // Передаём токен в заголовок
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // 1) Проверяем на базовые ошибки
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            guard let data = data else {
-                // можно вернуть какую-то ошибку
-                return
-            }
-            // 3) Парсим JSON
-            do {
-                let decoder = JSONDecoder()
-                let user = try decoder.decode(User.self, from: data)
-                // 4) Передаём массив во completion
-                completion(.success(user))
-            } catch {
-                completion(.failure(error))
-            }
-            
-        }
-        
-        task.resume()
-    }
 
 }

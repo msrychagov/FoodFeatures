@@ -13,7 +13,7 @@ from .models import User
 from .schemas import TokenData
 
 # Эта зависимость скажет FastAPI, что токен берём из /login (или где вы определили)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()

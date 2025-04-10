@@ -4,8 +4,13 @@ final class CategoriesViewController: UIViewController, CategoriesViewLogic {
     
     //MARK: - Constants
     enum Constants {
-        enum Other {
-            static let translatesAutoresizingMaskIntoConstraints: Bool = false
+        enum CollectionView {
+            static let sectionInset: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16)
+            static let minimumInteritemSpacing: CGFloat = 16
+            static let minimumLineSpacing: CGFloat = 16
+            static let heightAndWidthDifference: CGFloat = 48
+            static let backgroundColor: UIColor = .clear
+            static let numberOfRows: CGFloat = 2
         }
     }
     
@@ -13,35 +18,21 @@ final class CategoriesViewController: UIViewController, CategoriesViewLogic {
     private let interactor: CategoriesBuisnessLogic
     private let market: Market
     private let chapter: String
-    private let categories: [Category] = [
-        Category(title: "Без лактозы", image: "noLactose", id: 1),
-        Category(title: "Без глютена", image: "noGluten", id: 2),
-        Category(title: "Без орехов", image: "noNuts", id: 3),
-        Category(title: "Без арахиса", image: "noPeanuts", id: 4),
-        Category(title: "Без сезама", image: "noSesame", id: 5),
-        Category(title: "Без сои", image: "noSoy", id: 6),
-        Category(title: "Без сельдерея", image: "noCelery", id: 7),
-        Category(title: "Без горчицы", image: "noMustard", id: 8),
-        Category(title: "Без люпина", image: "noLupin", id: 9),
-        Category(title: "Без рыбы", image: "noFish", id: 10),
-        Category(title: "Без ракообразных", image: "noCrustaceans", id: 11),
-        Category(title: "Без моллюсков", image: "noMollusks", id: 12),
-    ]
+    private var displayedCategories: [Category] = []
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         // Задаём отступы
-        layout.sectionInset = UIEdgeInsets(top: 16, left: 14, bottom: 14, right: 16)
-        layout.minimumInteritemSpacing = 10
-        layout.minimumLineSpacing = 10
+        layout.sectionInset = Constants.CollectionView.sectionInset
+        layout.minimumInteritemSpacing = Constants.CollectionView.minimumInteritemSpacing
+        layout.minimumLineSpacing = Constants.CollectionView.minimumLineSpacing
         
-        // Размер ячейки — подбирайте под свой дизайн
-        let itemWidth: CGFloat = (view.bounds.width - 14*3) / 2  // 2 колонки
-        layout.itemSize = CGSize(width: itemWidth, height: itemWidth + 40)
+        let itemWidth: CGFloat = (view.bounds.width - Constants.CollectionView.minimumInteritemSpacing - Constants.CollectionView.sectionInset.left - Constants.CollectionView.sectionInset.right) / Constants.CollectionView.numberOfRows  // 2 колонки
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth + Constants.CollectionView.heightAndWidthDifference)
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .clear
-        cv.translatesAutoresizingMaskIntoConstraints = false
+        cv.translatesAutoresizingMaskIntoConstraints = GeneralConstants.translatesAutoresizingMaskIntoConstraints
         cv.dataSource = self
         cv.delegate = self
         cv.register(CategoryCell.self, forCellWithReuseIdentifier: CategoryCell.reuseIdentifier)
@@ -60,35 +51,40 @@ final class CategoriesViewController: UIViewController, CategoriesViewLogic {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - Methods
+    //MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = GeneralConstants.viewControllerBackgroundColor
+        interactor.setDisplayedCategories(request: CategoriesModels.SetDisplayedCategories.Request())
         configureUI()
     }
     
+    //MARK: - Methods
+    func displayCategories(viewModel: CategoriesModels.SetDisplayedCategories.ViewModel) {
+        self.displayedCategories = viewModel.displayedCategories
+        collectionView.reloadData()
+    }
+    
+    //MARK: - Configure
     private func configureUI() {
-        view.addSubview(collectionView)
-        
-        NSLayoutConstraint.activate([
-                collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
         configureNavigationBar()
+        configureCollectionView()
     }
     
     private func configureNavigationBar() {
         navigationItem.title = market.title
     }
-    //MARK: - Actions
+    
+    private func configureCollectionView() {
+        view.addSubview(collectionView)
+        collectionView.pin(to: view)
+    }
 }
 
 // MARK: - UICollectionViewDataSource
 extension CategoriesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories.count
+        return displayedCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -99,19 +95,16 @@ extension CategoriesViewController: UICollectionViewDataSource {
         guard let categoryCell = cell as? CategoryCell else {
             return cell
         }
-        categoryCell.configure(category: categories[indexPath.item])
+        categoryCell.configure(category: displayedCategories[indexPath.item])
         return cell
     }
 }
 
-// MARK: - UICollectionViewDelegate (если нужно обработать нажатия)
+// MARK: - UICollectionViewDelegate
 extension CategoriesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCategory = categories[indexPath.item]
-        let categoryProductsVC = ProductsListAssembly.build(marketId: self.market.id, category: selectedCategory, chapter: chapter)
-        
-        navigationController?.pushViewController(categoryProductsVC, animated: true)
-        print("Вы выбрали категорию: \(selectedCategory.title)")
-        // Тут можно, например, открыть детальный экран или фильтровать список продуктов
+        let selectedCategory = displayedCategories[indexPath.item]
+        let request = CategoriesModels.RouteToProductsList.Request(navigationController: self.navigationController, marketId: self.market.id, category: selectedCategory, chapter: self.chapter)
+        interactor.routeToProductsList(request: request)
     }
 }

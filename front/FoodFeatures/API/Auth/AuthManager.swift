@@ -26,22 +26,6 @@ class AuthManager {
         KeychainHelper.standard.delete(service: service, account: account)
     }
     
-    // Сохранение userId
-//    func saveUserId(_ userId: Int) {
-//        let userIdString = String(userId)
-//        KeychainHelper.standard.save(userIdString, service: service, account: account)
-//    }
-//    
-//    // Чтение userId
-//    func getUserId() -> Int? {
-//        // Считываем строку из Keychain
-//        if let userIdString = KeychainHelper.standard.read(service: service, account: account) {
-//            // Преобразуем в Int
-//            return Int(userIdString)
-//        }
-//        return nil
-//    }
-    
     func isLoggedIn() -> Bool {
         return getToken() != nil
     }

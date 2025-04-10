@@ -1,7 +1,7 @@
 import UIKit
 
 enum Markets {
-    enum routeToCategories {
+    enum RouteToCategories {
         struct Request {
             var navigationController: UINavigationController?
             var market: Market
@@ -11,6 +11,18 @@ enum Markets {
             var navigationController: UINavigationController?
             var market: Market
             var chapter: String
+        }
+    }
+    
+    enum FetchMarkets {
+        struct Request {
+            
+        }
+        struct Response {
+            let markets: [Market]
+        }
+        struct ViewModel {
+            let markets: [Market]
         }
     }
 }
